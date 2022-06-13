@@ -1,18 +1,19 @@
-﻿# GASDocumentation
-My understanding of Unreal Engine 5's GameplayAbilitySystem plugin (GAS) with a simple multiplayer sample project. This is not official documentation and neither this project nor myself are affiliated with Epic Games. I make no guarantee for the accuracy of this information.
+﻿# Документация GAS
+Мое понимание плагина Gameplay Ability System (GAS) в Unreal Engine 5 на примере простого многопользовательского проекта. Это документация не является оффициальной, ни я, ни этот проект не связаны с Epic Games. Я не даю никаких гарантий за точность этой информации.
 
-The goal of this documentation is to explain the major concepts and classes in GAS and provide some additional commentary based on my experience with it. There is a lot of 'tribal knowledge' of GAS among users in the community and I aim to share all of mine here.
+Цель этой документации - объяснить основные концепции и классы GAS и предоставить некоторые дополнительные комментарии, основанные на моем опыте работы с GAS. Среди пользователей сообщества существует много "накопленных знаний" о GAS, и я стремлюсь поделиться здесь своими.
 
-The Sample Project and documentation are current with **Unreal Engine 5.0**. There are branches of this documentation for older versions of Unreal Engine, but they are no longer supported and are liable to have bugs or out of date information.
+Образец проекта и документация актуальны для **Unreal Engine 5.0**.
+The Sample Project and documentation are current with **Unreal Engine 5.0**. Существуют ветки этой документации для более старых версий Unreal Engine, но они больше не поддерживаются и могут содержать ошибки или устаревшую информацию.
 
-[GASShooter](https://github.com/tranek/GASShooter) is a sister Sample Project demonstrating advanced techniques with GAS for a multiplayer FPS/TPS.
+[GASShooter](https://github.com/tranek/GASShooter) это проект-образец, демонстрирующий передовые методы работы с GAS для многопользовательского FPS/TPS.
 
-The best documentation will always be the plugin source code.
+Лучшей документацией всегда будет исходный код плагина.
 
 <a name="table-of-contents"></a>
 ## Table of Contents
 
-> 1. [Intro to the GameplayAbilitySystem Plugin](#intro)
+> 1. [Введение в плагин GameplayAbilitySystem](#intro)
 > 1. [Sample Project](#sp)
 > 1. [Setting Up a Project Using GAS](#setup)
 > 1. [Concepts](#concepts)  
@@ -166,94 +167,94 @@ The best documentation will always be the plugin source code.
 >    * [4.24](#changelog-4.24)
          
 <a name="intro"></a>
-## 1. Intro to the GameplayAbilitySystem Plugin
-From the [Official Documentation](https://docs.unrealengine.com/en-US/Gameplay/GameplayAbilitySystem/index.html):
->The Gameplay Ability System is a highly-flexible framework for building abilities and attributes of the type you might find in an RPG or MOBA title. You can build actions or passive abilities for the characters in your games to use, status effects that can build up or wear down various attributes as a result of these actions, implement "cooldown" timers or resource costs to regulate the usage of these actions, change the level of the ability and its effects at each level, activate particle or sound effects, and more. Put simply, this system can help you to design, implement, and efficiently network in-game abilities as simple as jumping or as complex as your favorite character's ability set in any modern RPG or MOBA title.
+## 1. Введение в плагин GameplayAbilitySystem
+Из [Официальной документации:](https://docs.unrealengine.com/en-US/Gameplay/GameplayAbilitySystem/index.html):
+> Gameplay Ability System - это очень гибкая основа для создания способностей и атрибутов, подобных тем, которые можно встретить в RPG или MOBA играх. Вы можете создавать активные или пассивные способности, которые могут использовать персонажи вашей игры, эффекты состояний, которые могут увеличивать или уменьшать различные атрибуты в результате этих действий, таймеры "отката" и затраты ресурсов для использования этих способностей, изменять уровень способности и эффекты на каждом уровне, активировать системы частицы или звуковые эффекты и многое другое. Проще говоря, эта система поможет вам разработать, реализовать и эффективно использовать в игре такие простые способности, как прыжок, или такие сложные, как набор способностей вашего любимого персонажа в любой современной RPG или MOBA.
 
-The GameplayAbilitySystem plugin is developed by Epic Games and comes with Unreal Engine 5 (UE5). It has been battle tested in AAA commercial games such as Paragon and Fortnite among others.
+Плагин GameplayAbilitySystem разработан компанией Epic Games и поставляется с Unreal Engine 5 (UE5). Он прошел боевые испытания в коммерческих AAA-играх, таких как Paragon и Fortnite.
 
-The plugin provides an out-of-the-box solution in single and multiplayer games for:
-* Implementing level-based character abilities or skills with optional costs and cooldowns ([GameplayAbilities](#concepts-ga))
-* Manipulating numerical `Attributes` belonging to actors ([Attributes](#concepts-a))
-* Applying status effects to actors ([GameplayEffects](#concepts-ge))
-* Applying `GameplayTags` to actors ([GameplayTags](#concepts-gt))
-* Spawning visual or sound effects ([GameplayCues](#concepts-gc))
-* Replication of everything mentioned above
+Плагин предоставляет готовое решение в одиночных и многопользовательских играх для:
+* Позволяет создавать способности (Замедление, Огненый шар) или навыки (Защита, Ближний бой) для персонажа, с наличием уровня, стоимостью применения и возможностью отката [GameplayAbilities](#concepts-ga)
+* Изменение числовых `Attributes`, принадлежащим акторам ([Attributes](#concepts-a))
+* Применение эффектов состояния к Actor ([GameplayEffects](#concepts-ge))
+* Применение `GameplayTags` к Actor ([GameplayTags](#concepts-gt))
+* Порождение визуальных или звуковых эффектов ([GameplayCues](#concepts-gc))
+* Репликация всего вышеперечисленного
 
-In multiplayer games, GAS provides support for [client-side prediction](#concepts-p) of:
-* Ability activation
-* Playing animation montages
-* Changes to `Attributes`
-* Applying `GameplayTags`
-* Spawning `GameplayCues`
-* Movement via `RootMotionSource` functions connected to the `CharacterMovementComponent`.
+В многопользовательских играх GAS обеспечивает поддержку прогнозирования на стороне клиента [client-side prediction](#concepts-p):
+* Активация способности
+* Воспроизведение Animation Montages
+* Изменение `Attributes`
+* Применение `GameplayTags`
+* Порождение `GameplayCues`
+* Движение персонажа через функции `RootMotionSource` подключенные к `CharacterMovementComponent`.
 
-**GAS must be set up in C++**, but `GameplayAbilities` and `GameplayEffects` can be created in Blueprint by the designers.
+**GAS должен быть создан на C++, но `GameplayAbilities` и `GameplayEffects` могут быть созданы дизайнерами в Blueprint.
 
-Current issues with GAS:
-* `GameplayEffect` latency reconciliation (can't predict ability cooldowns resulting in players with higher latencies having lower rate of fire for low cooldown abilities compared to players with lower latencies).
-* Cannot predict the removal of `GameplayEffects`. We can however predict adding `GameplayEffects` with the inverse effects, effectively removing them. This is not always appropriate or feasible and still remains an issue.
-* Lack of boilerplate templates, multiplayer examples, and documentation. Hopefully this helps with that!
+Текущие проблемы с GAS:
+* Согласование задержки `GameplayEffect` (невозможно предсказать время отката способности, в результате чего игроки с более высоким пингом имеют меньшую скорострельность для способностей с малым временем отката по сравнению с игроками с более низким пингом).
+* Невозможно предсказать удаление `GameplayEffects`. Однако мы можем предсказать добавление `GameplayEffects` с обратными эффектами, эффективно удаляя их. Это не всегда уместно или осуществимо и по-прежнему остается проблемой.
+* Отсутствие шаблонов, примеров мультиплеера и документации. Надеюсь, это поможет в этом!
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="sp"></a>
-## 2. Sample Project
-A multiplayer third person shooter sample project is included with this documentation aimed at people new to the GameplayAbilitySystem Plugin but not new to Unreal Engine 5. Users are expected to know C++, Blueprints, UMG, Replication, and other intermediate topics in UE5. This project provides an example of how to set up a basic third person shooter multiplayer-ready project with the `AbilitySystemComponent` (`ASC`) on the `PlayerState` class for player/AI controlled heroes and the `ASC` on the `Character` class for AI controlled minions.
+## 2. Образец проекта
+В эту документацию включен пример многопользовательского шутера от третьего лица, предназначенный для тех, кто только знакомится с плагином Gameplay Ability System, но не новичок в Unreal Engine 5. Предполагается, что пользователи знают C++, Blueprints, UMG, Replication и другие промежуточные темы в UE5. В этом проекте приводится пример того, как настроить базовый проект мультиплеерного шутера от третьего лица с `AbilitySystemComponent` (`ASC`) на классе `PlayerState` для персонажей, управляемых Игроками/AI, и `ASC` на классе `Character` для врагов, управляемых AI.
 
-The goal is to keep this project simple while showing the GAS basics and demonstrating some commonly requested abilities with well-commented code. Because of its beginner focus, the project does not show advanced topics like [predicting projectiles](#concepts-p-spawn).
+Цель проекта - сделать его простым, показать основы GAS и продемонстрировать некоторые часто запрашиваемые способности с хорошо прокомментированным кодом. Поскольку проект ориентирован на новичков, в нем не рассматриваются такие продвинутые темы, как [предсказание снарядов](#concepts-p-spawn).
 
-Concepts demonstrated:
-* `ASC` on `PlayerState` vs `Character`
-* Replicated `Attributes`
-* Replicated animation montages
+Продемонстрированные концепции:
+* `ASC` на `PlayerState` против `Character`
+* Репликация `Attributes`
+* Репликация animation montages
 * `GameplayTags`
-* Applying and removing `GameplayEffects` inside of and externally from `GameplayAbilities`
-* Applying damage mitigated by armor to change health of a character
+* Применение и удаление `GameplayEffects` внутри и вне `GameplayAbilities`
+* Применение урона, смягченного броней, для изменения здоровья персонажа
 * `GameplayEffectExecutionCalculations`
-* Stun effect
-* Death and respawn
-* Spawning actors (projectiles) from an ability on the server
-* Predictively changing the local player's speed with aim down sights and sprinting
-* Constantly draining stamina to sprint
-* Using mana to cast abilities
-* Passive abilities
-* Stacking `GameplayEffects`
-* Targeting actors
-* `GameplayAbilities` created in Blueprint
-* `GameplayAbilities` created in C++
-* Instanced per `Actor` `GameplayAbilities`
+* Эффект оглушения
+* Смерть и возрождение
+* Порождение Actors (Снарядов) из GA на сервере
+* Предсказуемое изменение скорости локального игрока при прицеливании и спринте
+* Постоянный расход выносливости на спринт
+* Использование маны для применения способностей
+* Пассивные способности
+* Настакивание `GameplayEffects`
+* Нацеливание на акторов
+* Создание `GameplayAbilities` в Blueprint
+* Создание `GameplayAbilities` в C++
+* Создание объекта `GameplayAbilities` для `Actor`
 * Non-Instanced `GameplayAbilities` (Jump)
-* Static `GameplayCues` (FireGun projectile impact particle effect)
-* Actor `GameplayCues` (Sprint and Stun particle effects)
+* Статические `GameplayCues` (VFX от удара снаряда FireGun)
+* Актор `GameplayCues` (VFX спринта и оглушения)
 
-The hero class has the following abilities:
+Класс персонажа обладает следующими способностями:
 
-| Ability                    | Input Bind          | Predicted  | C++ / Blueprint | Description                                                                                                                                                                  |
+| Способность                | Клавиша для использования          | Прогнозируемый  | C++ / Blueprint | Описание                                                                                                                                                                  |
 | -------------------------- | ------------------- | ---------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Jump                       | Space Bar           | Yes        | C++             | Makes the hero jump.                                                                                                                                                         |
-| Gun                        | Left Mouse Button   | No         | C++             | Fires a projectile from the hero's gun. The animation is predicted but the projectile is not.                                                                                |
-| Aim Down Sights            | Right Mouse Button  | Yes        | Blueprint       | While the button is held, the hero will walk slower and the camera will zoom in to allow more precise shots with the gun.                                                    |
-| Sprint                     | Left Shift          | Yes        | Blueprint       | While the button is held, the hero will run faster draining stamina.                                                                                                         |
-| Forward Dash               | Q                   | Yes        | Blueprint       | The hero dashes forward at the cost of stamina.                                                                                                                              |
-| Passive Armor Stacks       | Passive             | No         | Blueprint       | Every 4 seconds the hero gains a stack of armor up to a maximum of 4 stacks. Receiving damage removes one stack of armor.                                                    |
-| Meteor                     | R                   | No         | Blueprint       | Player targets a location to drop a meteor on the enemies causing damage and stunning them. The targeting is predicted while spawning the meteor is not.                     |
+| Jump                       | Space Bar           | Yes        | C++             | Прыжок                                                                                                                                                         |
+| Gun                        | Left Mouse Button   | No         | C++             | Выпускает снаряд из оружия. Анимация предсказана, но снаряд не предсказан                                                                                |
+| Aim Down Sights            | Right Mouse Button  | Yes        | Blueprint       | Если удерживать кнопку нажатой, персонаж будет идти медленнее, а камера будет увеличивать изображение, что позволит делать более точные выстрелы из пистолета.                                                    |
+| Sprint                     | Left Shift          | Yes        | Blueprint       | Если удерживать кнопку нажатой, персонаж будет бежать быстрее, расходуя выносливость.                                                                                                         |
+| Forward Dash               | Q                   | Yes        | Blueprint       | Рывок вперед, затрачивая выносливость.                                                                                                                               |
+| Passive Armor Stacks       | Passive             | No         | Blueprint       | Каждые 4 секунды персонаж получает стак брони, максимум 4 стака. Получение урона снимает один стек брони.                                                    |
+| Meteor                     | R                   | No         | Blueprint       | Игрок нацеливается на место, чтобы сбросить метеор на врагов, нанося им урон и оглушая их. Наведение на цель предсказуемо, а порождение метеора - нет.                     |
 
-It does not matter if `GameplayAbilities` are created in C++ or Blueprint. A mixture of the two were used here for example of how to do them in each language.
+Не имеет значения, создаются `GameplayAbilities` на C++ или Blueprint. Смесь этих двух языков была использована здесь для примера того, как их делать на каждом из них.
 
-Minions do not come with any predefined `GameplayAbilities`. The Red Minions have more health regen while the Blue Minions have higher starting health.
+Враги не обладают какими-либо предопределенными `GameplayAbilities`. У красных врагов больше регенерация здоровья, а у синих врагов больше начальное здоровье.
 
-For `GameplayAbility` naming, I used the suffix `_BP` to denote the `GameplayAbility's` logic was created in Blueprint. The lack of suffix means the logic was created in C++.
+Для именования `GameplayAbility` я использовал суффикс _BP, чтобы обозначить, что логика `GameplayAbility` была создана в Blueprint. Отсутствие суффикса означает, что логика была создана на C++.
 
 **Blueprint Asset Naming Prefixes**
 
-| Prefix      | Asset Type          |
+| Префикс     | Тип Ассета          |
 | ----------- | ------------------- |
 | GA_         | GameplayAbility     |
 | GC_         | GameplayCue         |
 | GE_         | GameplayEffect      |
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="setup"></a>
 ## 3. Setting Up a Project Using GAS
@@ -265,7 +266,7 @@ Basic steps to set up a project using GAS:
 
 That's all that you have to do to enable GAS. From here, add an [`ASC`](#concepts-asc) and [`AttributeSet`](#concepts-as) to your `Character` or `PlayerState` and start making [`GameplayAbilities`](#concepts-ga) and [`GameplayEffects`](#concepts-ge)!
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts"></a>
 ## 4. GAS Concepts
@@ -311,7 +312,7 @@ The `ASC` defines three different replication modes for replicating `GameplayEff
 
 Starting with 4.24, `PossessedBy()` now sets the owner of the `Pawn` to the new `Controller`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-asc-setup"></a>
 ### 4.1.2 Setup and Initialization
@@ -405,7 +406,7 @@ void AGDHeroCharacter::OnRep_PlayerState()
 
 If you get the error message `LogAbilitySystem: Warning: Can't activate LocalOnly or LocalPredicted ability %s when not local!` then you did not initialize your `ASC` on the client.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gt"></a>
 ### 4.2 Gameplay Tags
@@ -446,7 +447,7 @@ If you want to filter a `GameplayTag` parameter in a function, use the `UFUNCTIO
 
 The Sample Project extensively uses `GameplayTags`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gt-change"></a>
 ### 4.2.1 Responding to Changes in Gameplay Tags
@@ -461,7 +462,7 @@ The callback function has a parameter for the `GameplayTag` and the new `TagCoun
 virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-a"></a>
 ### 4.3 Attributes
@@ -474,7 +475,7 @@ virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 **Tip:** If you don't want an `Attribute` to show up in the Editor's list of `Attributes`, you can use the `Meta = (HideInDetailsView)` `property specifier`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-a-value"></a>
 #### 4.3.2 BaseValue vs CurrentValue
@@ -484,7 +485,7 @@ Often beginners to GAS will confuse `BaseValue` with a maximum value for an `Att
 
 Permanent changes to the `BaseValue` come from `Instant` `GameplayEffects` whereas `Duration` and `Infinite` `GameplayEffects` change the `CurrentValue`. Periodic `GameplayEffects` are treated like instant `GameplayEffects` and change the `BaseValue`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-a-meta"></a>
 #### 4.3.3 Meta Attributes
@@ -494,7 +495,7 @@ Some `Attributes` are treated as placeholders for temporary values that are inte
 
 While `Meta Attributes` are a good design pattern, they are not mandatory. If you only ever have one `Execution Calculation` used for all instances of damage and one `Attribute Set` class shared by all characters, then you may be fine doing the damage distribution to health, shields, etc. inside of the `Execution Calculation` and directly modifying those `Attributes`. You'll only be sacrificing flexibility, but that may be okay for you.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-a-changes"></a>
 #### 4.3.4 Responding to Attribute Changes
@@ -514,7 +515,7 @@ A custom Blueprint node that wraps this into an `ASyncTask` is included in the S
 
 ![Listen for Attribute Change BP Node](https://github.com/tranek/GASDocumentation/raw/master/Images/attributechange.png)
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-a-derived"></a>
 #### 4.3.5 Derived Attributes
@@ -532,7 +533,7 @@ In this example, we have an `Infinite` `GameplayEffect` that derives the value o
 
 ![Derived Attribute Example](https://github.com/tranek/GASDocumentation/raw/master/Images/derivedattribute.png)
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-as"></a>
 ### 4.4 Attribute Set
@@ -541,7 +542,7 @@ In this example, we have an `Infinite` `GameplayEffect` that derives the value o
 #### 4.4.1 Attribute Set Definition
 The `AttributeSet` defines, holds, and manages changes to `Attributes`. Developers should subclass from [`UAttributeSet`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UAttributeSet/index.html). Creating an `AttributeSet` in an `OwnerActor's` constructor automatically registers it with its `ASC`. **This must be done in C++**.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-as-design"></a>
 #### 4.4.2 Attribute Set Design
