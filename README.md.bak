@@ -405,7 +405,7 @@ void AGDHeroCharacter::OnRep_PlayerState()
 }
 ```
 
-Если вы получите сообщение об ошибке `LogAbilitySystem: Warning: Can't activate LocalOnly or LocalPredicted ability %s when not local!`, то вы не инициализировали свой `ASC` на клиенте.
+If you get the error message `LogAbilitySystem: Warning: Can't activate LocalOnly or LocalPredicted ability %s when not local!` then you did not initialize your `ASC` on the client.
 
 **[⬆ Вернуться к началу](#table-of-contents)**
 
