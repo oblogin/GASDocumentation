@@ -798,7 +798,7 @@ Your custom `AggregatorEvaluateMetaData` for qualifiers should be added to `FAgg
 ### 4.5 Gameplay Effects
 
 <a name="concepts-ge-definition"></a>
-#### 4.5.1 Gameplay Effect Definition
+#### 4.5.1 Определение Gameplay Effect
 [`GameplayEffects`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UGameplayEffect/index.html) (`GE`) are the vessels through which abilities change [`Attributes`](#concepts-a) and [`GameplayTags`](#concepts-gt) on themselves and others. They can cause immediate `Attribute` changes like damage or healing or apply long term status buff/debuffs like a movespeed boost or stunning. The `UGameplayEffect` class is a meant to be a **data-only** class that defines a single gameplay effect. No additional logic should be added to `GameplayEffects`. Typically designers will create many Blueprint child classes of `UGameplayEffect`.
 
 `GameplayEffects` change `Attributes` through [`Modifiers`](#concepts-ge-mods) and [`Executions` (`GameplayEffectExecutionCalculation`)](#concepts-ge-ec).
@@ -831,70 +831,75 @@ UpdateAllAggregatorModMagnitudes(Effect);
 **[⬆ Back to Top](#table-of-contents)**
 
 <a name="concepts-ge-applying"></a>
-#### 4.5.2 Applying Gameplay Effects
-`GameplayEffects` can be applied in many ways from functions on [`GameplayAbilities`](#concepts-ga) and functions on the `ASC` and usually take the form of `ApplyGameplayEffectTo`. The different functions are essentially convenience functions that will eventually call `UAbilitySystemComponent::ApplyGameplayEffectSpecToSelf()` on the `Target`.
+#### 4.5.2 Применение Gameplay Effects
+`GameplayEffects` могут быть применены различными способами, начиная от функций в [`GameplayAbilities`](#concepts-ga) и заканчивая функциями в `ASC`, и обычно принимают форму `ApplyGameplayEffectTo`. Различные функции по сути являются вспомогательными функциями, которые в конечном итоге вызовут `UAbilitySystemComponent::ApplyGameplayEffectSpecToSelf()` на `Target`.
 
-To apply `GameplayEffects` outside of a `GameplayAbility` for example from a projectile, you need to get the `Target's` `ASC` and use one of its functions to `ApplyGameplayEffectToSelf`.
+Чтобы применить `GameplayEffects` вне `GameplayAbility`, например, от снаряда, необходимо получить ASC у `Target` и использовать одну из функций `ApplyGameplayEffectToSelf.
 
-You can listen for when any `Duration` or `Infinite` `GameplayEffects` are applied to an `ASC` by binding to its delegate:
+Вы можете прослушивать, когда к `ASC` применяются какие-либо `Duration` или `Infinite` `GameplayEffects`, привязавшись к его делегату:
 ```c++
 AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &APACharacterBase::OnActiveGameplayEffectAddedCallback);
 ```
-The callback function:
+Функция обратного вызова:
 ```c++
 virtual void OnActiveGameplayEffectAddedCallback(UAbilitySystemComponent* Target, const FGameplayEffectSpec& SpecApplied, FActiveGameplayEffectHandle ActiveHandle);
 ```
 
-The server will always call this function regardless of replication mode. The autonomous proxy will only call this for replicated `GameplayEffects` in `Full` and `Mixed` replication modes. Simulated proxies will only call this in `Full` [replication mode](#concepts-asc-rm).
+Сервер будет вызывать эту функцию всегда, независимо от режима репликации. `Автономный прокси` будет вызывать эту функцию только для реплицированных `GameplayEffects` в режимах `Full` и `Mixed` репликации. Симулированные прокси будут вызывать эту функцию только в режиме `Full` [replication mode](#concepts-asc-rm).
 
 **[⬆ Back to Top](#table-of-contents)**
 
 <a name="concepts-ga-removing"></a>
-#### 4.5.3 Removing Gameplay Effects
-`GameplayEffects` can be removed in many ways from functions on [`GameplayAbilities`](#concepts-ga) and functions on the `ASC` and usually take the form of `RemoveActiveGameplayEffect`. The different functions are essentially convenience functions that will eventually call `FActiveGameplayEffectsContainer::RemoveActiveEffects()` on the `Target`.
+#### 4.5.3 Удаление Gameplay Effects
 
-To remove `GameplayEffects` outside of a `GameplayAbility`, you need to get the `Target's` `ASC` and use one of its functions to `RemoveActiveGameplayEffect`.
+`GameplayEffects` могут быть удалены различными способами из функций на [`GameplayAbilities`](#concepts-ga) и функций на `ASC` и обычно принимают форму `RemoveActiveGameplayEffect`. Различные функции по сути являются вспомогательными функциями, которые в конечном итоге вызовут `FActiveGameplayEffectsContainer::RemoveActiveEffects()` на `Target`.
 
-You can listen for when any `Duration` or `Infinite` `GameplayEffects` are removed from an `ASC` by binding to its delegate:
+Чтобы удалить `GameplayEffects` вне `GameplayAbility`, необходимо получить `ASC` у `Target` и использовать одну из ее функций `RemoveActiveGameplayEffect`.
+
+Вы можете прослушать, когда какие-либо `Duration` или `Infinite` `GameplayEffects` будут удалены из `ASC`, связавшись с его делегатом:
+
 ```c++
 AbilitySystemComponent->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &APACharacterBase::OnRemoveGameplayEffectCallback);
 ```
-The callback function:
+Функция обратного вызова:
 ```c++
 virtual void OnRemoveGameplayEffectCallback(const FActiveGameplayEffect& EffectRemoved);
 ```
 
-The server will always call this function regardless of replication mode. The autonomous proxy will only call this for replicated `GameplayEffects` in `Full` and `Mixed` replication modes. Simulated proxies will only call this in `Full` [replication mode](#concepts-asc-rm).
+Сервер будет вызывать эту функцию всегда, независимо от режима репликации. `Автономный прокси` будет вызывать эту функцию только для реплицированных `GameplayEffects` в режимах `Full` и `Mixed` репликации. Симулированные прокси будут вызывать эту функцию только в режиме `Full` [replication mode](#concepts-asc-rm).
 
 **[⬆ Back to Top](#table-of-contents)**
 
 <a name="concepts-ge-mods"></a>
 #### 4.5.4 Gameplay Effect Modifiers
-`Modifiers` change an `Attribute` and are the only way to [predictively](#concepts-p) change an `Attribute`. A `GameplayEffect` can have zero or many `Modifiers`. Each `Modifier` is responsible for changing only one `Attribute` via a specified operation.
+`Modifiers` изменяют `Attribute` и являются единственным способом [предсказуемого](#concepts-p) изменения  `Attribute`. `GameplayEffect` может иметь ноль или много `Modifiers`. Каждый `Modifier` отвечает за изменение только одного `Attribute` с помощью определенной операции.
 
-| Operation  | Description                                                                                                         |
+| Операция   | Описание                                                                                                            |
 | ---------- | ------------------------------------------------------------------------------------------------------------------- |
-| `Add`      | Adds the result to the `Modifier's` specified `Attribute`. Use a negative value for subtraction.                    |
-| `Multiply` | Multiplies the result to the `Modifier's` specified `Attribute`.                                                    |
-| `Divide`   | Divides the result against the `Modifier's` specified `Attribute`.                                                  |
-| `Override` | Overrides the `Modifier's` specified `Attribute` with the result.                                                   |
+| `Add`      | Добавляет значение `Modifier` к указанному `Attribute`. Для вычитания используйте отрицательное значение            |
+| `Multiply` | Умножает значение `Attribute` на указанный `Modifier`                                                               |
+| `Divide`   | Разделяет значение `Attribute` на указанный `Modifier`                                                              |
+| `Override` | Переопределяет указанный `Attribute` значением `Modifier`                                                           |
 
-The `CurrentValue` of an `Attribute` is the aggregate result of all of its `Modifiers` added to its `BaseValue`. The formula for how `Modifiers` are aggregated is defined as follows in `FAggregatorModChannel::EvaluateWithBase` in `GameplayEffectAggregator.cpp`:
+`CurrentValue` у `Attribute` - это суммарный результат всех его `Modifiers`, добавленных к его `BaseValue`. Формула для агрегирования `Modifiers` определяется следующим образом в `FAggregatorModChannel::EvaluateWithBase` в `GameplayEffectAggregator.cpp`:
+
 ```c++
 ((InlineBaseValue + Additive) * Multiplicitive) / Division
 ```
 
-Any `Override` `Modifiers` will override the final value with the last applied `Modifier` taking precedence.
+Любые `Override` `Modifiers` будут переопределять окончательное значение, причем приоритет будет иметь последний примененный `Modifier`.
 
-**Note:** For percentage based changes, make sure to use the `Multiply` operation so that it happens after addition.
+**Примечание:** Для изменений, основанных на процентах, обязательно используйте операцию `Multiply`, чтобы она выполнялась после сложения.
 
-**Note:** [Prediction](#concepts-p) has trouble with percentage changes.
+**Примечание:** [Предсказание](#concepts-p) имеет проблемы с процентными изменениями.
 
 There are four types of `Modifiers`: Scalable Float, Attribute Based, Custom Calculation Class, and Set By Caller. They all generate some float value that is then used to change the specified `Attribute` of the `Modifier` based on its operation.
 
-| `Modifier` Type            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+Существует четыре типа `Modifiers`: Scalable Float, Attribute Based, Custom Calculation Class и Set By Caller. Все они генерируют некоторое значение типа float, которое затем используется для изменения указанного `Attribute` в зависимости от его работы.
+
+| `Modifier`             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Scalable Float`           | `FScalableFloats` are a structure that can point to a Data Table that has the variables as rows and levels as columns. The Scalable Floats will automatically read the value of the specified table row at the ability's current level (or different level if overriden on the [`GameplayEffectSpec`](#concepts-ge-spec)). This value can further be manipulated by a coefficient. If no Data Table/Row is specified, it treats the value as a 1 so the coefficient can be used to hard code in a single value at all levels. ![ScalableFloat](https://github.com/tranek/GASDocumentation/raw/master/Images/scalablefloats.png)                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `Scalable Float`           | `FScalableFloats` - это структура, которая может указывать на Data Table, в которой переменные являются строками, а уровни - столбцами. Scalable Floats автоматически считывает значение указанной строки таблицы на текущем уровне способности (или на другом уровне, если он переопределен в [`GameplayEffectSpec`](#concepts-ge-spec)). Этим значением можно далее манипулировать с помощью коэффициента. Если таблица/строка данных не указана, значение будет считаться равным 1, поэтому коэффициент может быть использован для жесткого ввода одного значения на всех уровнях. ![ScalableFloat](https://github.com/tranek/GASDocumentation/raw/master/Images/scalablefloats.png)                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `Attribute Based`          | `Attribute Based` `Modifiers` take the `CurrentValue` or `BaseValue` of a backing `Attribute` on the `Source` (who created the `GameplayEffectSpec`) or `Target` (who received the `GameplayEffectSpec`) and further modifies it with a coefficient and pre and post coefficient additions. `Snapshotting` means the backing `Attribute` is captured when the `GameplayEffectSpec` is created whereas no snapshotting means the `Attribute` is captured when the `GameplayEffectSpec` is applied.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `Custom Calculation Class` | `Custom Calculation Class` provides the most flexibility for complex `Modifiers`. This `Modifier` takes a [`ModifierMagnitudeCalculation`](#concepts-ge-mmc) class and can further manipulate the resulting float value with a coefficient and pre and post coefficient additions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `Set By Caller`            | `SetByCaller` `Modifiers` are values that are set outside of the `GameplayEffect` at runtime by the ability or whoever made the `GameplayEffectSpec` on the `GameplayEffectSpec`. For example, you would use a `SetByCaller` if you want to set the damage to be based on how long the player held down a button to charge the ability. `SetByCallers` are essentially `TMap<FGameplayTag, float>` that live on the `GameplayEffectSpec`. The `Modifier` is just telling the `Aggregator` to look for a `SetByCaller` value associated with the supplied `GameplayTag`. The `SetByCallers` used by `Modifiers` can only use the `GameplayTag` version of the concept. The `FName` version is disabled here. If the `Modifier` is set to `SetByCaller` but a `SetByCaller` with the correct `GameplayTag` does not exist on the `GameplayEffectSpec`, the game will throw a runtime error and return a value of 0. This might cause issues in the case of a `Divide` operation. See [`SetByCallers`](#concepts-ge-spec-setbycaller) for more information on how to use `SetByCallers`. |
