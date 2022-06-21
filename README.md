@@ -799,26 +799,25 @@ Your custom `AggregatorEvaluateMetaData` for qualifiers should be added to `FAgg
 
 <a name="concepts-ge-definition"></a>
 #### 4.5.1 Определение Gameplay Effect
-[`GameplayEffects`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UGameplayEffect/index.html) (`GE`) are the vessels through which abilities change [`Attributes`](#concepts-a) and [`GameplayTags`](#concepts-gt) on themselves and others. They can cause immediate `Attribute` changes like damage or healing or apply long term status buff/debuffs like a movespeed boost or stunning. The `UGameplayEffect` class is a meant to be a **data-only** class that defines a single gameplay effect. No additional logic should be added to `GameplayEffects`. Typically designers will create many Blueprint child classes of `UGameplayEffect`.
+[`GameplayEffects`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UGameplayEffect/index.html) (`GE`) — сосуды, через которые способности меняют [`Attributes`](#concepts-a) и [`GameplayTags`](#concepts-gt) на себе и других. Они могут вызывать немедленные изменения `Attribute`, такие как урон или исцеление или применять долгосрочные баффы / дебаффы, такие как повышение скорости передвижения или оглушение. Класс `UGameplayEffect` должен быть классом **только для данных**, который определяет один игровой эффект. Никакой дополнительной логики не следует добавлять в `GameplayEffects`. Обычно дизайнеры создают множество дочерних классов Blueprint для `UGameplayEffect`.
 
-`GameplayEffects` change `Attributes` through [`Modifiers`](#concepts-ge-mods) and [`Executions` (`GameplayEffectExecutionCalculation`)](#concepts-ge-ec).
+`GameplayEffects` изменяет `Attributes` посредствам [`Modifiers`](#concepts-ge-mods) и [`Executions` (`GameplayEffectExecutionCalculation`)](#concepts-ge-ec).
 
-`GameplayEffects` have three types of duration: `Instant`, `Duration`, and `Infinite`.
+`GameplayEffects` имеют три типа продолжительности: `Instant`, `Duration`, и `Infinite`.
 
-Additionally, `GameplayEffects` can add/execute [`GameplayCues`](#concepts-gc). An `Instant` `GameplayEffect` will call `Execute` on the `GameplayCue` `GameplayTags` whereas a `Duration` or `Infinite` `GameplayEffect` will call `Add` and `Remove` on the `GameplayCue` `GameplayTags`.
+Кроме того, `GameplayEffects` может добавлять/выполнять [`GameplayCues`](#concepts-gc). `GameplayEffect` с типом продолжительности `Instant` вызывает `Execute` для `GameplayCue` и `GameplayTags`, тогда как `GameplayEffect` с типом продолжительности `Duration` или `Infinite` вызывает `Add` и `Remove` для `GameplayCue` `GameplayTags`.
 
-| Duration Type | GameplayCue Event | When to use                                                                                                                                                                                                                                |
-| ------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Instant`     | Execute           | For immediate permanent changes to `Attribute's` `BaseValue`. `GameplayTags` will not be applied, not even for a frame.                                                                                                                    |
-| `Duration`    | Add & Remove      | For temporary changes to `Attribute's` `CurrentValue` and to apply `GameplayTags` that will be removed when the `GameplayEffect` expires or is manually removed. The duration is specified in the `UGameplayEffect` class/Blueprint.       |
-| `Infinite`    | Add & Remove      | For temporary changes to `Attribute's` `CurrentValue` and to apply `GameplayTags` that will be removed when the `GameplayEffect` is removed. These will never expire on their own and must be manually removed by an ability or the `ASC`. |
+| Тип продолжительности  | GameplayCue Event | Когда использовать                                                                                                                                                                                                                                              |
+|------------------------| ----------------- |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Instant`              | Execute           | Для постоянного изменения `BaseValue` у `Attribute`. `GameplayTags` не применяются.                                                                                                                                                                             |
+| `Duration`             | Add & Remove      | Для временного изменений `CurrentValue` у `Attribute` и применения `GameplayTags`, которые будут удалены по истечении срока действия `GameplayEffect` или будут удалены вручную. Продолжительность эффекта указывается в class или blueprint `UGameplayEffect`. |
+| `Infinite`             | Add & Remove      | Для временного изменений `CurrentValue` у `Attribute` и применения `GameplayTags`, которые будут удалены при удалении `GameplayEffect`. Они никогда не исчезнут сами по себе и должны быть удалены вручную с помощью способности или `ASC`.                      |
 
-`Duration` and `Infinite` `GameplayEffects` have the option of applying `Periodic Effects` that apply its `Modifiers` and `Executions` every `X` seconds as defined by its `Period`. `Periodic Effects` are treated as `Instant` `GameplayEffects` when it comes to changing the `Attribute's` `BaseValue` and `Executing` `GameplayCues`. These are useful for damage over time (DOT) type effects. **Note:** `Periodic Effects` cannot be [predicted](#concepts-p).
+`GameplayEffects` с типом продолжительности `Duration` и `Infinite`  имеют возможность применять `Periodic Effects`, которые применяют `Modifiers` и `Executions` каждые `X` секунд, как определено в `Period` у `GameplayEffects`. `Periodic Effects` рассматриваются как `GameplayEffects` с типом продолжительности `Instant`, когда речь идет об изменении `BaseValue` у `Attribute` и `Executing` у `GameplayCues`. Они полезны для эффектов типа урона с течением времени (DOT). **Примечание**. `Periodic Effects` нельзя [предсказать](#concepts-p).
 
-`Duration` and `Infinite` `GameplayEffects` can be temporarily turned off and on after application if their `Ongoing Tag Requirements` are not met/met ([Gameplay Effect Tags](#concepts-ge-tags)). Turning off a `GameplayEffect` removes the effects of its `Modifiers` and applied `GameplayTags` but does not remove the `GameplayEffect`. Turning the `GameplayEffect` back on reapplies its `Modifiers` and `GameplayTags`.
+`GameplayEffects` с типом продолжительности `Duration` и `Infinite` могут быть временно отключены и включены после применения, если их требования к текущим тегам (`Ongoing Tag Requirements`) не выполняются/не выполняются ([Gameplay Effect Tags](#concepts-ge-tags)). Отключение `GameplayEffect` удаляет эффекты его `Modifiers` и примененных `GameplayTags`, но не удаляет `GameplayEffect`. При повторном включении `GameplayEffect` повторно применяются его `Modifiers` и `GameplayEffect`.
 
-If you need to manually recalculate the `Modifiers` of a `Duration` or `Infinite` `GameplayEffect` (say you have an `MMC` that uses data that doesn't come from `Attributes`), you can call `UAbilitySystemComponent::ActiveGameplayEffects.SetActiveGameplayEffectLevel(FActiveGameplayEffectHandle ActiveHandle, int32 NewLevel)` with the same level that it already has using `UAbilitySystemComponent::ActiveGameplayEffects.GetActiveGameplayEffect(ActiveHandle).Spec.GetLevel()`. `Modifiers` that are based on backing `Attributes` automatically update when those backing `Attributes` update. The key functions of `SetActiveGameplayEffectLevel()` to update the `Modifiers` are:
-
+Если вам нужно вручную пересчитать `Modifiers` у `GameplayEffect` с типом продолжительсности `Duration` или `Infinite` (скажем, у вас есть `MMC`, которая использует данные, которые не поступают из `Attributes`), вы можете вызвать `UAbilitySystemComponent::ActiveGameplayEffects.SetActiveGameplayEffectLevel(FActiveGameplayEffectHandle ActiveHandle, int32 NewLevel)` с тем же уровенем, который он уже имеет, используя `UAbilitySystemComponent::ActiveGameplayEffects.GetActiveGameplayEffect(ActiveHandle).Spec.GetLevel()`. `Modifiers`, основанные на резервных `Attributes`, автоматически обновляются при обновлении этих резервных `Attributes`. Ключевые функции `SetActiveGameplayEffectLevel()` для обновления `Modifiers`:
 ```C++
 MarkItemDirty(Effect);
 Effect.Spec.CalculateModifierMagnitudes();
@@ -2239,55 +2238,55 @@ GAS comes with `AbilityTasks` for moving `Characters` over time for things like 
 
 <a name="concepts-gc-definition"></a>
 #### 4.8.1 Gameplay Cue Definition
-`GameplayCues` (`GC`) execute non-gameplay related things like sound effects, particle effects, camera shakes, etc. `GameplayCues` are typically replicated (unless explicitly `Executed`, `Added`, or `Removed` locally) and predicted.
+`GameplayCues` (`GC`) выполняют вещи, не связанные с игровым процессом, такие как звуковые эффекты, эффекты частиц, дрожание камеры и т. д. `GameplayCues` обычно реплицируются (если явно не `Executed`, не `Added` или не `Removed` локально) и прогнозируются.
 
-We trigger `GameplayCues` by sending a corresponding `GameplayTag` with the **mandatory parent name of `GameplayCue.`** and an event type (`Execute`, `Add`, or `Remove`) to the `GameplayCueManager` via the `ASC`. `GameplayCueNotify` objects and other `Actors` that implement the `IGameplayCueInterface` can subscribe to these events based on the `GameplayCue's` `GameplayTag` (`GameplayCueTag`).
+Мы запускаем `GameplayCues`, отправляя соответствующий `GameplayTag` с обязательным родительским именем `GameplayCue.` и тип события (`Execute`, `Add` или `Remove`) в `GameplayCueManager` через `ASC`. Объекты `GameplayCueNotify` и другие `Actors`, реализующие `IGameplayCueInterface`, могут подписываться на эти события на основе `GameplayCue` `GameplayTag` (`GameplayCueTag`).
 
-**Note:** Just to reiterate, `GameplayCue` `GameplayTags` need to start with the parent `GameplayTag` of `GameplayCue`. So for example, a valid `GameplayCue` `GameplayTag` might be `GameplayCue.A.B.C`.
+**Примечание:** Повторимся, что `GameplayTag` для `GameplayCue` должен начинаться с родительского `GameplayCue` тэга. Так, например, допустимый `GameplayCue` для `GameplayTag` может быть `GameplayCue.A.B.C`.
 
-There are two classes of `GameplayCueNotifies`, `Static` and `Actor`. They respond to different events and different types of `GameplayEffects` can trigger them. Override the corresponding event with your logic.
+Есть два класса `GameplayCueNotifies`, `Static` и `Actor`. Они реагируют на разные события и их могут запускать разные типы `GameplayEffects`. Переопределите соответствующее событие своей логикой.
 
-| `GameplayCue` Class                                                                                                                  | Event             | `GameplayEffect` Type    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`GameplayCueNotify_Static`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UGameplayCueNotify_Static/index.html) | `Execute`         | `Instant` or `Periodic`  | Static `GameplayCueNotifies` operate on the `ClassDefaultObject` (meaning no instances) and are perfect for one-off effects like hit impacts.                                                                                                                                                                                                                                                                                                                                                                        |
-| [`GameplayCueNotify_Actor`](https://docs.unrealengine.com/en-US/BlueprintAPI/GameplayCueNotify/index.html)                           | `Add` or `Remove` | `Duration` or `Infinite` | Actor `GameplayCueNotifies` spawn a new instance when `Added`. Because these are instanced, they can do actions over time until they are `Removed`. These are good for looping sounds and particle effects that will be removed when the backing `Duration` or `Infinite` `GameplayEffect` is removed or by manually calling remove. These also come with options to manage how many are allowed to be `Added` at the same so that multiple applications of the same effect only start the sounds or particles once. |
+| Класс `GameplayCue`                                                                                                                  | Событие            | Тип `GameplayEffect`       | Описание                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|--------------------------------------------------------------------------------------------------------------------------------------|--------------------|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`GameplayCueNotify_Static`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UGameplayCueNotify_Static/index.html) | `Execute`          | `Instant` или `Periodic`   | Static `GameplayCueNotifies` работают с `ClassDefaultObject` (не создаются экземпляры) и идеально подходят для одноразовых эффектов, таких как удары.                                                                                                                                                                                                                                                                                                                                                                                                          |
+| [`GameplayCueNotify_Actor`](https://docs.unrealengine.com/en-US/BlueprintAPI/GameplayCueNotify/index.html)                           | `Add` или `Remove` | `Duration` или `Infinite`  | Актор `GameplayCueNotifies` порождает новый экземпляр при `Added`. Поскольку они инстанцированы, они могут выполнять действия в течение времени, пока не будут `Removed`. Они хорошо подходят для зацикленных звуков и эффектов частиц, которые будут `Removed`, когда будет удален `GameplayEffect` с типом `Duration` или `Infinite` или вручную вызовом `Remove`. Они также имеют опции для управления тем, сколько их может быть добавлено одновременно, чтобы несколько применений одного и того же эффекта запускали звуки или частицы только один раз.  |
 
-`GameplayCueNotifies` technically can respond to any of the events but this is typically how we use them.
+`GameplayCueNotifies` технически может реагировать на любое из событий, но мы обычно используем их именно так.
 
-**Note:** When using `GameplayCueNotify_Actor`, check `Auto Destroy on Remove` otherwise subsequent calls to `Add` that `GameplayCueTag` won't work.
+**Примечание**. При использовании `GameplayCueNotify_Actor` выберите `Auto Destroy on Remove`, иначе последующие вызовы `Add` этого `GameplayCueTag` не будут работать.
 
-When using an `ASC` [Replication Mode](#concepts-asc-rm) other than `Full`, `Add` and `Remove` `GC` events will fire twice on Server players (listen server) - once for applying the `GE` and again from the "Minimal" `NetMultiCast` to the clients. However, `WhileActive` events will still only fire once. All events will only fire once on clients.
+При использовании режима [репликации](#concepts-asc-rm) на `ASC`, отличного от `Full`, события `Add` и `Remove` `GC` будут происходить дважды на игроках сервера (сервер прослушивания) - один раз для применения `GE` и второй раз от "Минимальной" `NetMultiCast` к клиентам. Однако события `WhileActive` будут срабатывать только один раз. Все события будут срабатывать только один раз на клиентах.
 
-The Sample Project includes a `GameplayCueNotify_Actor` for stun and sprint effects. It also has a `GameplayCueNotify_Static` for the FireGun's projectile impact. These `GCs` can be optimized further by [triggering them locally](#concepts-gc-local) instead of replicating them through a `GE`. I opted for showing the beginner way of using them in the Sample Project.
+Образец проекта включает в себя `GameplayCueNotify_Actor` для эффектов оглушения и спринта. Он также имеет `GameplayCueNotify_Static` для удара снаряда FireGun. Эти `GC` можно дополнительно оптимизировать, [запуская их локально](#concepts-gc-local), а не реплицируя их через `GE`. Я решил показать способ их использования для начинающих в примере проекта.
 
 **[⬆ Back to Top](#table-of-contents)**
 
 <a name="concepts-gc-trigger"></a>
-#### 4.8.2 Triggering Gameplay Cues
+#### 4.8.2 Запуск Gameplay Cues
 
-From inside of a `GameplayEffect` when it is successfully applied (not blocked by tags or immunity), fill in the `GameplayTags` of all the `GameplayCues` that should be triggered.
+Внутри `GameplayEffect`, когда он успешно применен (не заблокирован тегами или иммунитетом), заполните `GameplayTags` всех `GameplayCues`, которые должны быть вызваны.
 
-![GameplayCue Triggered from a GameplayEffect](https://github.com/tranek/GASDocumentation/raw/master/Images/gcfromge.png)
+![GameplayCue срабатывающая от GameplayEffect](https://github.com/tranek/GASDocumentation/raw/master/Images/gcfromge.png)
 
-`UGameplayAbility` offers Blueprint nodes to `Execute`, `Add`, or `Remove` `GameplayCues`.
+`UGameplayAbility` предоставляет узлам Blueprint возможность `Execute`, `Add` или `Remove` `GameplayCues`.
 
-![GameplayCue Triggered from a GameplayAbility](https://github.com/tranek/GASDocumentation/raw/master/Images/gcfromga.png)
+![GameplayCue срабатывающая от GameplayAbility](https://github.com/tranek/GASDocumentation/raw/master/Images/gcfromga.png)
 
-In C++, you can call functions directly on the `ASC` (or expose them to Blueprint in your `ASC` subclass):
+В C++ вы можете вызывать функции непосредственно на `ASC` (или открывать их для Blueprint в вашем подклассе `ASC`):
 
 ```c++
-/** GameplayCues can also come on their own. These take an optional effect context to pass through hit result, etc */
+/** GameplayCues также могут появляться сами по себе. Они принимают необязательный контекст эффекта для передачи через результат удара и т.д. */
 void ExecuteGameplayCue(const FGameplayTag GameplayCueTag, FGameplayEffectContextHandle EffectContext = FGameplayEffectContextHandle());
 void ExecuteGameplayCue(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
 
-/** Add a persistent gameplay cue */
+/** Добавить постоянный GameplayCue */
 void AddGameplayCue(const FGameplayTag GameplayCueTag, FGameplayEffectContextHandle EffectContext = FGameplayEffectContextHandle());
 void AddGameplayCue(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
 
-/** Remove a persistent gameplay cue */
+/** Удалить постоянный GameplayCue */
 void RemoveGameplayCue(const FGameplayTag GameplayCueTag);
 	
-/** Removes any GameplayCue added on its own, i.e. not as part of a GameplayEffect. */
+/** Удаляет любой GameplayCue, добавленный самостоятельно, т.е. не как часть GameplayEffect. */
 void RemoveAllGameplayCues();
 ```
 
