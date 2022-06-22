@@ -657,7 +657,7 @@ Limitations:
 1. Unknown engineering cost
 1. Is it even possible?
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-as-attributes"></a>
 #### 4.4.3 Defining Attributes
@@ -708,7 +708,7 @@ void UGDAttributeSetBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 If the `Attribute` is not replicated like a `Meta Attribute`, then the `OnRep` and `GetLifetimeReplicatedProps` steps can be skipped.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-as-init"></a>
 #### 4.4.4 Initializing Attributes
@@ -727,7 +727,7 @@ See `AttributeSet.h` for more ways to initialize `Attributes`.
 
 **Note:** Prior to 4.24, `FAttributeSetInitterDiscreteLevels` did not work with `FGameplayAttributeData`. It was created when `Attributes` were raw floats and will complain about `FGameplayAttributeData` not being `Plain Old Data` (`POD`). This is fixed in 4.24 https://issues.unrealengine.com/issue/UE-76557.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-as-preattributechange"></a>
 #### 4.4.5 PreAttributeChange()
@@ -749,7 +749,7 @@ This is triggered from any changes to `Attributes`, whether using `Attribute` se
 
 **Note:** Epic's comments for `PreAttributeChange()` say not to use it for gameplay events and instead use it mainly for clamping. The recommended place for gameplay events on `Attribute` change is `UAbilitySystemComponent::GetGameplayAttributeValueChangeDelegate(FGameplayAttribute Attribute)` ([Responding to Attribute Changes](#concepts-a-changes)).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-as-postgameplayeffectexecute"></a>
 #### 4.4.6 PostGameplayEffectExecute()
@@ -761,7 +761,7 @@ Other `Attributes` that will only have their `BaseValue` changed from instant `G
 
 **Note:** When `PostGameplayEffectExecute()` is called, changes to the `Attribute` have already happened, but they have not replicated back to clients yet so clamping values here will not cause two network updates to clients. Clients will only receive the update after clamping.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-as-onattributeaggregatorcreated"></a>
 #### 4.4.7 OnAttributeAggregatorCreated()
@@ -792,7 +792,7 @@ void UGSAttributeSetBase::OnAttributeAggregatorCreated(const FGameplayAttribute&
 
 Your custom `AggregatorEvaluateMetaData` for qualifiers should be added to `FAggregatorEvaluateMetaDataLibrary` as static variables.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge"></a>
 ### 4.5 Gameplay Effects
@@ -827,7 +827,7 @@ UpdateAllAggregatorModMagnitudes(Effect);
 
 `GameplayEffects` are not typically instantiated. When an ability or `ASC` wants to apply a `GameplayEffect`, it creates a [`GameplayEffectSpec`](#concepts-ge-spec) from the `GameplayEffect's` `ClassDefaultObject`. Successfully applied `GameplayEffectSpecs` are then added to a new struct called `FActiveGameplayEffect` which is what the `ASC` keeps track of in a special container struct called `ActiveGameplayEffects`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-applying"></a>
 #### 4.5.2 Применение Gameplay Effects
@@ -846,7 +846,7 @@ virtual void OnActiveGameplayEffectAddedCallback(UAbilitySystemComponent* Target
 
 Сервер будет вызывать эту функцию всегда, независимо от режима репликации. `Автономный прокси` будет вызывать эту функцию только для реплицированных `GameplayEffects` в режимах `Full` и `Mixed` репликации. Симулированные прокси будут вызывать эту функцию только в режиме `Full` [replication mode](#concepts-asc-rm).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-removing"></a>
 #### 4.5.3 Удаление Gameplay Effects
@@ -867,7 +867,7 @@ virtual void OnRemoveGameplayEffectCallback(const FActiveGameplayEffect& EffectR
 
 Сервер будет вызывать эту функцию всегда, независимо от режима репликации. `Автономный прокси` будет вызывать эту функцию только для реплицированных `GameplayEffects` в режимах `Full` и `Mixed` репликации. Симулированные прокси будут вызывать эту функцию только в режиме `Full` [replication mode](#concepts-asc-rm).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-mods"></a>
 #### 4.5.4 Gameplay Effect Modifiers
@@ -903,7 +903,7 @@ There are four types of `Modifiers`: Scalable Float, Attribute Based, Custom Cal
 | `Custom Calculation Class` | `Custom Calculation Class` provides the most flexibility for complex `Modifiers`. This `Modifier` takes a [`ModifierMagnitudeCalculation`](#concepts-ge-mmc) class and can further manipulate the resulting float value with a coefficient and pre and post coefficient additions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `Set By Caller`            | `SetByCaller` `Modifiers` are values that are set outside of the `GameplayEffect` at runtime by the ability or whoever made the `GameplayEffectSpec` on the `GameplayEffectSpec`. For example, you would use a `SetByCaller` if you want to set the damage to be based on how long the player held down a button to charge the ability. `SetByCallers` are essentially `TMap<FGameplayTag, float>` that live on the `GameplayEffectSpec`. The `Modifier` is just telling the `Aggregator` to look for a `SetByCaller` value associated with the supplied `GameplayTag`. The `SetByCallers` used by `Modifiers` can only use the `GameplayTag` version of the concept. The `FName` version is disabled here. If the `Modifier` is set to `SetByCaller` but a `SetByCaller` with the correct `GameplayTag` does not exist on the `GameplayEffectSpec`, the game will throw a runtime error and return a value of 0. This might cause issues in the case of a `Divide` operation. See [`SetByCallers`](#concepts-ge-spec-setbycaller) for more information on how to use `SetByCallers`. |
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-mods-multiplydivide"></a>
 ##### 4.5.4.1 Multiply and Divide Modifiers
@@ -999,7 +999,7 @@ float FAggregatorModChannel::MultiplyMods(const TArray<FAggregatorMod>& InMods, 
 }
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-mods-gameplaytags"></a>
 ##### 4.5.4.2 Gameplay Tags on Modifiers
@@ -1010,7 +1010,7 @@ float FAggregatorModChannel::MultiplyMods(const TArray<FAggregatorMod>& InMods, 
 
 This means in detail: The tags of the source ASC and the target ASC are captured by `GameplayEffects`. The source ASC tags are captured, when the `GameplayEffectSpec` is created, the target ASC tags are captured on execution of the effect. When determining, if a Modifier of an infinite or duration effect "qualifies" to be applied (i.e. its Aggregator qualifies) and those filters are set, the captured tags are compared against the filters.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-stacking"></a>
 #### 4.5.5 Stacking Gameplay Effects
@@ -1029,7 +1029,7 @@ The Sample Project includes a custom Blueprint node that listens for `GameplayEf
 
 ![Listen for GameplayEffect Stack Change BP Node](https://github.com/tranek/GASDocumentation/raw/master/Images/gestackchange.png)
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-ga"></a>
 #### 4.5.6 Granted Abilities
@@ -1045,7 +1045,7 @@ Designers can choose which abilities a `GameplayEffect` grants, what level to gr
 | Remove Ability on End      | The granted ability is allowed to finish and then is removed from the Target.                                                                                                   |
 | Do Nothing                 | The granted ability is not affected by the removal of the granting `GameplayEffect` from the Target. The Target has the ability permanently until it is manually removed later. |
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-tags"></a>
 #### 4.5.7 Gameplay Effect Tags
@@ -1059,7 +1059,7 @@ Designers can choose which abilities a `GameplayEffect` grants, what level to gr
 | Application Tag Requirements      | Tags on the Target that determine if a `GameplayEffect` can be applied to the Target. If these requirements are not met, the `GameplayEffect` is not applied.                                                                                                                                                                                                                      |
 | Remove Gameplay Effects with Tags | `GameplayEffects` on the Target that have any of these tags in their `Asset Tags` or `Granted Tags` will be removed from the Target when this `GameplayEffect` is successfully applied.                                                                                                                                                                                            |
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-immunity"></a>
 #### 4.5.8 Immunity
@@ -1071,7 +1071,7 @@ Designers can choose which abilities a `GameplayEffect` grants, what level to gr
 
 The queries have helpful hover tooltips in the `GameplayEffect` Blueprint.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-spec"></a>
 #### 4.5.9 Gameplay Effect Spec
@@ -1091,7 +1091,7 @@ Notable `GameplayEffectSpec` Contents:
 * `DynamicAssetTags` that the `GameplayEffectSpec` has in addition to the `AssetTags` that the `GameplayEffect` has.
 * `SetByCaller` `TMaps`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-spec-setbycaller"></a>
 ##### 4.5.9.1 SetByCallers
@@ -1128,7 +1128,7 @@ float GetSetByCallerMagnitude(FGameplayTag DataTag, bool WarnIfNotFound = true, 
 
 I recommend using the `GameplayTag` version over the `FName` version. This can prevent spelling errors in Blueprint and `GameplayTags` are more efficient to send over the network when the `GameplayEffectSpec` replicates than `FNames` since the `TMaps` replicate too.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-context"></a>
 #### 4.5.10 Gameplay Effect Context
@@ -1145,7 +1145,7 @@ To subclass the `GameplayEffectContext`:
 
 [GASShooter](https://github.com/tranek/GASShooter) uses a subclassed `GameplayEffectContext` to add `TargetData` which can be accessed in `GameplayCues`, specifically for the shotgun since it can hit more than one enemy.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-mmc"></a>
 #### 4.5.11 Modifier Magnitude Calculation
@@ -1220,7 +1220,7 @@ float UPAMMC_PoisonMana::CalculateBaseMagnitude_Implementation(const FGameplayEf
 
 If you don't add the `FGameplayEffectAttributeCaptureDefinition` to `RelevantAttributesToCapture` in the `MMC's` constructor and try to capture `Attributes`, you will get an error about a missing Spec while capturing. If you don't need to capture `Attributes`, then you don't have to add anything to `RelevantAttributesToCapture`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-ec"></a>
 #### 4.5.12 Gameplay Effect Execution Calculation
@@ -1243,7 +1243,7 @@ For `Local Predicted`, `Server Only`, and `Server Initiated` [`GameplayAbilities
 
 Calculating damage received based on a complex formula reading from many attributes on the `Source` and the `Target` is the most common example of an `ExecCalc`. The included Sample Project has a simple `ExecCalc` for calculating damage that reads the value of damage from the `GameplayEffectSpec's` [`SetByCaller`](#concepts-ge-spec-setbycaller) and then mitigates that value based on the armor `Attribute` captured from the `Target`. See `GDDamageExecCalculation.cpp/.h`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-ec-senddata"></a>
 ##### 4.5.12.1 Sending Data to Execution Calculations
@@ -1320,7 +1320,7 @@ Use caution if modifying the `GameplayEffectSpec` in the `ExecutionCalculation`.
 FGameplayEffectSpec* GetOwningSpecForPreExecuteMod() const;
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-car"></a>
 #### 4.5.13 Custom Application Requirement
@@ -1332,7 +1332,7 @@ Examples of when to use `CARs`:
 
 `CARs` can also do more advanced things like checking if an instance of this `GameplayEffect` is already on the `Target` and [changing the duration](#concepts-ge-duration) of the existing instance instead of applying a new instance (return false for `CanApplyGameplayEffect()`).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-cost"></a>
 #### 4.5.14 Cost Gameplay Effect
@@ -1368,7 +1368,7 @@ FScalableFloat Cost;
 
 2. **Override `UGameplayAbility::GetCostGameplayEffect()`.** Override this function and [create a `GameplayEffect` at runtime](#concepts-ge-dynamic) that reads the cost value on the `GameplayAbility`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-cooldown"></a>
 #### 4.5.15 Cooldown Gameplay Effect
@@ -1487,7 +1487,7 @@ float UPGMMC_HeroAbilityCooldown::CalculateBaseMagnitude_Implementation(const FG
 
 ![Cooldown GE with MMC](https://github.com/tranek/GASDocumentation/raw/master/Images/cooldownmmc.png)
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-cooldown-tr"></a>
 ##### 4.5.15.1 Get the Cooldown Gameplay Effect's Remaining Time
@@ -1549,7 +1549,7 @@ A gameplay consequence of this is that players with high latencies have a lower 
 
 Allowing for true predicted cooldowns (player could activate a `GameplayAbility` when the local cooldown expires but the server is still on cooldown) is something that Epic would like to implement someday in a [future iteration of GAS](#concepts-p-future).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-duration"></a>
 #### 4.5.16 Changing Active Gameplay Effect Duration
@@ -1593,7 +1593,7 @@ bool UPAAbilitySystemComponent::SetGameplayEffectDurationHandle(FActiveGameplayE
 }
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-dynamic"></a>
 #### 4.5.17 Creating Dynamic Gameplay Effects at Runtime
@@ -1671,7 +1671,7 @@ void UGameplayAbilityRuntimeGE::ActivateAbility(const FGameplayAbilitySpecHandle
 }
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ge-containers"></a>
 #### 4.5.18 Gameplay Effect Containers
@@ -1683,7 +1683,7 @@ To access the `GESpecs` inside of the `GameplayEffectContainers` to do things li
 
 `GameplayEffectContainers` also contain an optional efficient means of [targeting](#concepts-targeting-containers).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga"></a>
 ### 4.6 Gameplay Abilities
@@ -1741,7 +1741,7 @@ Epic's comment:
 UAbilitySystemComponent::ServerSetInputPressed()
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-input"></a>
 #### 4.6.2 Binding Input to the ASC
@@ -1848,7 +1848,7 @@ void UGSAbilitySystemComponent::AbilityLocalInputPressed(int32 InputID)
 }
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-granting"></a>
 #### 4.6.3 Granting Abilities
@@ -1878,7 +1878,7 @@ void AGDCharacterBase::AddCharacterAbilities()
 
 When granting these `GameplayAbilities`, we're creating `GameplayAbilitySpecs` with the `UGameplayAbility` class, the ability level, the input that it is bound to, and the `SourceObject` or who gave this `GameplayAbility` to this `ASC`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-activating"></a>
 #### 4.6.4 Activating Abilities
@@ -1948,7 +1948,7 @@ void UGDGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo * ActorInfo
 
 Epic describes this function as the correct place to initiate passive abilities and to do `BeginPlay` type things.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-cancelabilities"></a>
 #### 4.6.5 Canceling Abilities
@@ -1975,7 +1975,7 @@ virtual void DestroyActiveState();
 
 **Note:** I have found that `CancelAllAbilities` doesn't seem to work right if you have a `Non-Instanced` `GameplayAbilities`. It seems to hit the `Non-Instanced` `GameplayAbility` and give up. `CancelAbilities` can handle `Non-Instanced` `GameplayAbilities` better and that is what the Sample Project uses (Jump is a non-instanced `GameplayAbility`). Your mileage may vary.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-definition-activeability"></a>
 #### 4.6.6 Getting Active Abilities
@@ -1990,7 +1990,7 @@ UAbilitySystemComponent::GetActivatableGameplayAbilitySpecsByAllMatchingTags(con
 
 Once you get the `FGameplayAbilitySpec` that you are looking for, you can call `IsActive()` on it.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-instancing"></a>
 #### 4.6.7 Instancing Policy
@@ -2002,7 +2002,7 @@ A `GameplayAbility's` `Instancing Policy` determines if and how the `GameplayAbi
 | Instanced Per Execution | Every time a `GameplayAbility` is activated, a new instance of the `GameplayAbility` is created. | The benefit of these `GameplayAbilities` is that the variables are reset everytime you activate. These provide worse performance than `Instanced Per Actor` since they will spawn new `GameplayAbilities` every time they activate. The Sample Project does not use any of these.                                                                                                                                 |
 | Non-Instanced           | The `GameplayAbility` operates on its `ClassDefaultObject`. No instances are created.            | This has the best performance of the three but is the most restrictive in what can be done with it. `Non-Instanced` `GameplayAbilities` cannot store state, meaning no dynamic variables and no binding to `AbilityTask` delegates. The best place to use them is for frequently used simple abilities like minion basic attacks in a MOBA or RTS. The Sample Project's Jump `GameplayAbility` is `Non-Instanced`. |
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-net"></a>
 #### 4.6.8 Net Execution Policy
@@ -2015,26 +2015,26 @@ A `GameplayAbility's` `Net Execution Policy` determines who runs the `GameplayAb
 | `Server Only`          | The `GameplayAbility` is only run on the server. Passive `GameplayAbilities` will typically be `Server Only`. Single player games should use this.                                                                  |
 | `Server Initiated`     | `Server Initiated` `GameplayAbilities` activate first on the server and then on the owning client. I personally haven't used these much if any.                                                                     | 
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-tags"></a>
 #### 4.6.9 Ability Tags
-`GameplayAbilities` come with `GameplayTagContainers` with built-in logic. None of these `GameplayTags` are replicated.
+`GameplayAbilities` поставляются с `GameplayTagContainers` со встроенной логикой. Ни один из этих `GameplayTags` не реплицируется.
 
-| `GameplayTag Container`     | Description                                                                                                                                                                                   |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Ability Tags`              | `GameplayTags` that the `GameplayAbility` owns. These are just `GameplayTags` to describe the `GameplayAbility`.                                                                              |
-| `Cancel Abilities with Tag` | Other `GameplayAbilities` that have these `GameplayTags` in their `Ability Tags` will be canceled when this `GameplayAbility` is activated.                                                   |
-| `Block Abilities with Tag`  | Other `GameplayAbilities` that have these `GameplayTags` in their `Ability Tags` are blocked from activating while this `GameplayAbility` is active.                                          |
-| `Activation Owned Tags`     | These `GameplayTags` are given to the `GameplayAbility's` owner while this `GameplayAbility` is active. Remember these are not replicated.                                                    |
-| `Activation Required Tags`  | This `GameplayAbility` can only be activated if the owner has **all** of these `GameplayTags`.                                                                                                |
-| `Activation Blocked Tags`   | This `GameplayAbility` cannot be activated if the owner has **any** of these `GameplayTags`.                                                                                                  |
-| `Source Required Tags`      | This `GameplayAbility` can only be activated if the `Source` has **all** of these `GameplayTags`. The `Source` `GameplayTags` are only set if the `GameplayAbility` is triggered by an event. |
-| `Source Blocked Tags`       | This `GameplayAbility` cannot be activated if the `Source` has **any** of these `GameplayTags`. The `Source` `GameplayTags` are only set if the `GameplayAbility` is triggered by an event.   |
-| `Target Required Tags`      | This `GameplayAbility` can only be activated if the `Target` has **all** of these `GameplayTags`. The `Target` `GameplayTags` are only set if the `GameplayAbility` is triggered by an event. |
-| `Target Blocked Tags`       | This `GameplayAbility` cannot be activated if the `Target` has **any** of these `GameplayTags`. The `Target` `GameplayTags` are only set if the `GameplayAbility` is triggered by an event.   |
+| `GameplayTag Container`     | Описание                                                                                                                                                                                                                         |
+| --------------------------- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Ability Tags`              | `GameplayTags`, которыми владеет `GameplayAbility`. Это всего лишь `GameplayTags` для описания `GameplayAbility`.                                                                                                                |
+| `Cancel Abilities with Tag` | Другие `GameplayAbilities`, у которых есть перечисленные `GameplayTags` в `Ability Tags`, будут отменены при активации этой `GameplayAbility`.                                                                                   |
+| `Block Abilities with Tag`  | Другие `GameplayAbilities`, у которых есть перечисленные `GameplayTags` в `Ability Tags`, блокируются от активации, пока эта `GameplayAbility` активна.                                                                          |
+| `Activation Owned Tags`     | Данные `GameplayTags` еакладываются на владельца `GameplayAbility`, пока текущая `GameplayAbility` активна. Помните, что они не реплицируются.                                                                                   |
+| `Activation Required Tags`  | Текущая `GameplayAbility` может быть активирована только в том случае, если у владельца есть все перечисленные здесь теги `GameplayTags`.                                                                                        |
+| `Activation Blocked Tags`   | Текущая `GameplayAbility` не может быть активирована, если у владельца есть **любой** из этих `GameplayTags`.                                                                                                                    |
+| `Source Required Tags`      | Текущая `GameplayAbility` может быть активирована только в том случае, если `Source` имеет **все** эти `GameplayTags`. `Source` `GameplayTags` устанавливается только в том случае, если `GameplayAbility` запускается событием. |
+| `Source Blocked Tags`       | Текущая `GameplayAbility` не может быть активирована, если `Source` имеет **любой** из этих `GameplayTags`. `Source` `GameplayTags` устанавливается только в том случае, если `GameplayAbility` запускается событием.            |
+| `Target Required Tags`      | Текущая `GameplayAbility` может быть активирована, только если у `Target` есть **все** эти `GameplayTags`. `Target` `GameplayTags` устанавливаются только в том случае, если `GameplayAbility` запускается событием.             |
+| `Target Blocked Tags`       | Текущая `GameplayAbility` не может быть активирована, если `Target` имеет **любой** из этих `GameplayTags`. `Target` `GameplayTags` устанавливаются только в том случае, если `GameplayAbility` запускается событием.            |
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-spec"></a>
 #### 4.6.10 Gameplay Ability Spec
@@ -2044,7 +2044,7 @@ When a `GameplayAbility` is granted on the server, the server replicates the `Ga
 
 Activating a `GameplayAbilitySpec` will create an instance (or not for `Non-Instanced` `GameplayAbilities`) of the `GameplayAbility` depending on its `Instancing Policy`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-data"></a>
 #### 4.6.11 Passing Data to Abilities
@@ -2057,7 +2057,7 @@ The general paradigm for `GameplayAbilities` is `Activate->Generate Data->Apply-
 | Use `TargetData`                                | A custom `TargetData` struct is a good way to pass arbitrary data between the client and server.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Store Data on the `OwnerActor` or `AvatarActor` | Use replicated variables stored on the `OwnerActor`, `AvatarActor`, or any other object that you can get a reference to. This method is the most flexible and will work with `GameplayAbilities` activated by input binds. However, it does not guarantee the data will be synchronized from replication at the time of use. You must ensure that ahead of time - meaning if you set a replicated variable and then immediately activate a `GameplayAbility` there is no guarantee the order that will happen on the receiver due to potential packet loss.                                                                                                                                                                                                                                   |
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-commit"></a>
 #### 4.6.12 Ability Cost and Cooldown
@@ -2069,7 +2069,7 @@ After a `GameplayAbility` calls `Activate()`, it can optionally commit the cost 
 
 See [`CostGE`](#concepts-ge-cost) and [`CooldownGE`](#concepts-ge-cooldown) for implementation details.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-leveling"></a>
 #### 4.6.13 Leveling Up Abilities
@@ -2082,7 +2082,7 @@ There are two common methods for leveling up an ability:
 
 The main difference between the two methods is if you want active `GameplayAbilities` to be canceled at the time of level up. You will most likely use both methods depending on your `GameplayAbilities`. I recommend adding a `bool` to your `UGameplayAbility` subclass specifying which method to use.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-sets"></a>
 #### 4.6.14 Ability Sets
@@ -2090,7 +2090,7 @@ The main difference between the two methods is if you want active `GameplayAbili
 
 I find this class to be unnecessary at least given what I've seen of it so far. The Sample Project handles all of the functionality of `GameplayAbilitySets` inside of the `GDCharacterBase` and its subclasses.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-batching"></a>
 #### 4.6.15 Ability Batching
@@ -2148,7 +2148,7 @@ GASShooter exposes a Blueprint node to allow batching abilities which the aforem
 
 ![Activate Batched Ability](https://github.com/tranek/GASDocumentation/raw/master/Images/batchabilityactivate.png)
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-ga-netsecuritypolicy"></a>
 #### 4.6.16 Net Security Policy
@@ -2161,7 +2161,7 @@ A `GameplayAbility`'s `NetSecurityPolicy` determines where should an ability exe
 | `ServerOnlyTermination` | A client requesting cancellation or ending of this ability will be ignored by the server. Clients can still request execution of the ability.      |
 | `ServerOnly`            | Server controls both execution and termination of this ability. A client making any requests will be ignored.                                      |
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-at"></a>
 ### 4.7 Ability Tasks
@@ -2180,7 +2180,7 @@ GAS comes with many `AbilityTasks` out of the box:
 
 The `UAbilityTask` constructor enforces a hardcoded game-wide maximum of 1000 concurrent `AbilityTasks` running at the same time. Keep this in mind when designing `GameplayAbilities` for games that can have hundreds of characters in the world at the same time like RTS games.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-at-definition"></a>
 ### 4.7.2 Custom Ability Tasks
@@ -2202,7 +2202,7 @@ Often you will be creating your own custom `AbilityTasks` (in C++). The Sample P
 
 `AbilityTasks` can `Tick` if you set `bTickingTask = true;` in the `AbilityTask` constructor and override `virtual void TickTask(float DeltaTime);`. This is useful when you need to lerp values smoothly across frames. See `AbilityTask_MoveToLocation.h/.cpp` as an example.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-at-using"></a>
 ### 4.7.3 Using Ability Tasks
@@ -2223,7 +2223,7 @@ In Blueprint, we just use the Blueprint node that we create for the `AbilityTask
 
 To manually cancel an `AbilityTask`, just call `EndTask()` on the `AbilityTask` object in Blueprint (called `Async Task Proxy`) or in C++.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-at-rms"></a>
 ### 4.7.4 Root Motion Source Ability Tasks
@@ -2231,7 +2231,7 @@ GAS comes with `AbilityTasks` for moving `Characters` over time for things like 
 
 **Note:** Predicting `RootMotionSource` `AbilityTasks` works up to engine version 4.19 and 4.25+. Prediction is bugged for engine versions 4.20-4.24; however, the `AbilityTasks` still perform their function in multiplayer with minor net corrections and work perfectly in single player. It is possible to cherry pick the [prediction fix](https://github.com/EpicGames/UnrealEngine/commit/94107438dd9f490e7b743f8e13da46927051bf33#diff-65f6196f9f28f560f95bd578e07e290c) from 4.25 into a custom 4.20-4.24 engine.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gc"></a>
 ### 4.8 Gameplay Cues
@@ -2259,7 +2259,7 @@ GAS comes with `AbilityTasks` for moving `Characters` over time for things like 
 
 Образец проекта включает в себя `GameplayCueNotify_Actor` для эффектов оглушения и спринта. Он также имеет `GameplayCueNotify_Static` для удара снаряда FireGun. Эти `GC` можно дополнительно оптимизировать, [запуская их локально](#concepts-gc-local), а не реплицируя их через `GE`. Я решил показать способ их использования для начинающих в примере проекта.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gc-trigger"></a>
 #### 4.8.2 Запуск Gameplay Cues
@@ -2290,7 +2290,7 @@ void RemoveGameplayCue(const FGameplayTag GameplayCueTag);
 void RemoveAllGameplayCues();
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gc-local"></a>
 #### 4.8.3 Local Gameplay Cues
@@ -2334,7 +2334,7 @@ void UPAAbilitySystemComponent::RemoveGameplayCueLocal(const FGameplayTag Gamepl
 
 If a `GameplayCue` was `Added` locally, it should be `Removed` locally. If it was `Added` via replication, it should be `Removed` via replication.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gc-parameters"></a>
 #### 4.8.4 Gameplay Cue Parameters
@@ -2360,7 +2360,7 @@ virtual void InitGameplayCueParameters_GESpec(FGameplayCueParameters& CueParamet
 virtual void InitGameplayCueParameters(FGameplayCueParameters& CueParameters, const FGameplayEffectContextHandle& EffectContext);
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gc-manager"></a>
 #### 4.8.5 Gameplay Cue Manager
@@ -2391,7 +2391,7 @@ virtual bool ShouldAsyncLoadRuntimeObjectLibraries() const override
 }
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gc-prevention"></a>
 #### 4.8.6 Prevent Gameplay Cues from Firing
@@ -2399,7 +2399,7 @@ Sometimes we don't want `GameplayCues` to fire. For example if we block an attac
 
 If you never want any `GameplayCues` to fire on a specific `ASC`, you can set `AbilitySystemComponent->bSuppressGameplayCues = true;`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gc-batching"></a>
 #### 4.8.7 Gameplay Cue Batching
@@ -2422,7 +2422,7 @@ https://forums.unrealengine.com/development-discussion/c-gameplay-programming/17
 ##### 4.8.7.2 Multiple GCs on one GE
 All of the `GameplayCues` on a `GameplayEffect` are sent in one RPC already. By default, `UGameplayCueManager::InvokeGameplayCueAddedAndWhileActive_FromSpec()` will send the whole `GameplayEffectSpec` (but converted to `FGameplayEffectSpecForRPC`) in the unreliable NetMulticast regardless of the `ASC`'s `Replication Mode`. This could potentially be a lot of bandwidth depending on what is in the `GameplayEffectSpec`. We can potentially optimize this by setting the cvar `AbilitySystem.AlwaysConvertGESpecToGCParams 1`. This will convert `GameplayEffectSpecs` to `FGameplayCueParameter` structures and RPC those instead of the whole `FGameplayEffectSpecForRPC`. This potentially saves bandwidth but also has less information, depending on how the `GESpec` is converted to `GameplayCueParameters` and what your `GCs` need to know.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gc-events"></a>
 #### 4.8.8 Gameplay Cue Events
@@ -2437,7 +2437,7 @@ All of the `GameplayCues` on a `GameplayEffect` are sent in one RPC already. By 
 
 Use `OnActive` for anything in your `GameplayCue` that happen at the start of the `GameplayCue` but is okay if late joiners miss. Use `WhileActive` for ongoing effects in the `GameplayCue` that you would want late joiners to see. For example, if you have a `GameplayCue` for a tower structure in a MOBA exploding, you would put the initial explosion particle system and explosion sound in `OnActive` and you would put any residual ongoing fire particles or sounds in the `WhileActive`. In this scenario, it wouldn't make sense for late joiners to replay the initial explosion from `OnActive`, but you would want them to see the persistent, looping fire effects on the ground after the explosion happened from `WhileActive`. `OnRemove` should clean up anything added in `OnActive` and `WhileActive`. `WhileActive` will be called every time an Actor enters the relevancy range of a `GameplayCueNotify_Actor`. `OnRemove` will be called every time an Actor leaves relevancy range of a `GameplayCueNotify_Actor`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-gc-reliability"></a>
 #### 4.8.9 Gameplay Cue Reliability
@@ -2460,7 +2460,7 @@ The `OnActive` and `WhileActive` events are called by an unreliable multicast.
 
 If you need something in a `GameplayCue` to be 'reliable', then apply it from a `GameplayEffect` and use `WhileActive` to add the FX and `OnRemove` to remove the FX.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-asg"></a>
 ### 4.9 Ability System Globals
@@ -2478,7 +2478,7 @@ Starting in UE 4.24, it is now necessary to call `UAbilitySystemGlobals::Get().I
 
 If you run into a crash while using the `AbilitySystemGlobals` `GlobalAttributeSetDefaultsTableNames`, you may need to call `UAbilitySystemGlobals::Get().InitGlobalData()` later like Fortnite in the `AssetManager` or in the `GameInstance`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-p"></a>
 ### 4.10 Prediction
@@ -2526,7 +2526,7 @@ Problems that GAS's prediction implementation is trying to solve:
 
 *From `GameplayPrediction.h`*
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-p-key"></a>
 #### 4.10.1 Prediction Key
@@ -2549,7 +2549,7 @@ GAS's prediction works on the concept of a `Prediction Key` which is an integer 
 
 Prediction keys are guaranteed to be valid during an atomic grouping of instructions "window" in `GameplayAbilities` starting with `Activation` from the activation prediction key. You can think of this as being only valid during one frame. Any callbacks from latent action `AbilityTasks` will no longer have a valid prediction key unless the `AbilityTask` has a built-in Synch Point which generates a new [Scoped Prediction Window](#concepts-p-windows).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-p-windows"></a>
 #### 4.10.2 Creating New Prediction Windows in Abilities
@@ -2565,7 +2565,7 @@ The Sample Project uses `WaitNetSync` in the Sprint `GameplayAbility` to create 
 
 If you have a predicted `GameplayEffect` that is playing twice on the owning client, your prediction key is stale and you're experiencing the "redo" problem. You can usually solve this by putting a `WaitNetSync` `AbilityTask` with `OnlyServerWait` right before you apply the `GameplayEffect` to create a new scoped prediction key.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-p-spawn"></a>
 #### 4.10.3 Predictively Spawning Actors
@@ -2581,7 +2581,7 @@ bool APAReplicatedActorExceptOwner::IsNetRelevantFor(const AActor * RealViewer, 
 
 If the spawned `Actor` affects gameplay like a projectile that needs to predict damage, then you need advanced logic that is outside of the scope of this documentation. Look at how UnrealTournament predictively spawns projectiles on Epic Games' GitHub. They have a dummy projectile spawned only on the owning client that synchs up with the server's replicated projectile.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-p-future"></a>
 #### 4.10.4 Future of Prediction in GAS
@@ -2591,13 +2591,13 @@ Dave Ratti from Epic has [expressed interest](https://epicgames.ent.box.com/s/m1
 
 The new [`Network Prediction` plugin](#concepts-p-npp) by Epic is expected to be fully interoperable with the GAS like the `CharacterMovementComponent` *was* before it.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-p-npp"></a>
 #### 4.10.5 Network Prediction Plugin
 Epic recently started an initiative to replace the `CharacterMovementComponent` with a new `Network Prediction` plugin. This plugin is still in its very early stages but is available to very early access on the Unreal Engine GitHub. It's too soon to tell which future version of the Engine that it will make its experimental beta debut in.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-targeting"></a>
 ### 4.11 Targeting
@@ -2610,7 +2610,7 @@ Epic recently started an initiative to replace the `CharacterMovementComponent` 
 
 We don't typically pass around the `FGameplayAbilityTargetData` directly, instead we use a [`FGameplayAbilityTargetDataHandle`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/Abilities/FGameplayAbilityTargetDataHandle/index.html) which has an internal TArray of pointers to `FGameplayAbilityTargetData`. This intermediate struct provides support for polymorphism of the `TargetData`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-targeting-actors"></a>
 #### 4.11.2 Target Actors
@@ -2645,7 +2645,7 @@ Depending on the particular subclass of `AGameplayAbilityTargetActor` that you u
 
 With the default `TargetActor` classes, `Actors` are only valid targets when they are directly in the trace/overlap. If they leave the trace/overlap (they move or you look away), they are no longer valid. If you want the `TargetActor` to remember the last valid target(s), you will need to add this functionality to a custom `TargetActor` class. I refer to these as persistent targets as they will persist until the `TargetActor` receives confirmation or cancellation, the `TargetActor` finds a new valid target in its trace/overlap, or the target is no longer valid (destroyed). GASShooter uses persistent targets for its rocket launcher's secondary ability's homing rockets targeting.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-target-data-filters"></a>
 #### 4.11.3 Target Data Filters
@@ -2674,7 +2674,7 @@ FGameplayTargetDataFilterHandle UGDTargetDataFilterBlueprintLibrary::MakeGDNameF
 }
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-targeting-reticles"></a>
 #### 4.11.4 Gameplay Ability World Reticles
@@ -2710,13 +2710,13 @@ void SetReticleMaterialParamVector(FName ParamName, FVector value);
 
 `Reticles` will only display on the current valid target with the default `TargetActors`. For example, if you're using a `AGameplayAbilityTargetActor_SingleLineTrace` to trace for a target, the `Reticle` will only appear when the enemy is directly in the trace path. If you look away, the enemy is no longer a valid target and the `Reticle` will disappear. If you want the `Reticle` to stay on the last valid target, you will want to customize your `TargetActor` to remember the last valid target and keep the `Reticle` on them. I refer to these as persistent targets as they will persist until the `TargetActor` receives confirmation or cancellation, the `TargetActor` finds a new valid target in its trace/overlap, or the target is no longer valid (destroyed).  GASShooter uses persistent targets for its rocket launcher's secondary ability's homing rockets targeting.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="concepts-targeting-containers"></a>
 #### 4.11.5 Gameplay Effect Containers Targeting
 [`GameplayEffectContainers`](#concepts-ge-containers) come with an optional, efficient means of producing [`TargetData`](#concepts-targeting-data). This targeting takes places instantly when the `EffectContainer` is applied on the client and the server. It's more efficient than [`TargetActors`](#concepts-targeting-actors) because it runs on the CDO of the targeting object (no spawning and destroying of `Actors`), but it lacks player input, happens instantly without needing confirmation, cannot be canceled, and cannot send data from the client to the server (produces data on both). It works well for instant traces and collision overlaps. Epic's [Action RPG Sample Project](https://www.unrealengine.com/marketplace/en-US/product/action-rpg) includes two example types of targeting with its containers - target the ability owner and pull `TargetData` from an event. It also implements one in Blueprint to do instant sphere traces at some offset (set by child Blueprint classes) from the player. You can subclass `URPGTargetType` in C++ or Blueprint to make your own targeting types.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="cae"></a>
 ## 5. Commonly Implemented Abilities and Effects
@@ -2731,7 +2731,7 @@ To prevent new `GameplayAbilities` from activating while stunned, the `GameplayA
 
 To prevent movement while stunned, we override the `CharacterMovementComponent's` `GetMaxSpeed()` function to return 0 when the owner has the stun `GameplayTag`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="cae-sprint"></a>
 ### 5.2 Sprint
@@ -2741,7 +2741,7 @@ The faster movement is handled predictively by the `CharacterMovementComponent` 
 
 The `GA` handles responding to the `Left Shift` input, tells the `CMC` to begin and stop sprinting, and to predictively charge stamina while `Left Shift` is pressed. See `GA_Sprint_BP` for details.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="cae-ads"></a>
 ### 5.3 Aim Down Sights
@@ -2751,7 +2751,7 @@ See `GDCharacterMovementComponent.h/cpp` for details on predictively decreasing 
 
 See `GA_AimDownSight_BP` for details on handling the input. There is no stamina cost for aiming down sights.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="cae-ls"></a>
 ### 5.4 Lifesteal
@@ -2776,7 +2776,7 @@ if (SpecAssetTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Effect.Damage.C
 }
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="cae-random"></a>
 ### 5.5 Generating a Random Number on Client and Server
@@ -2789,7 +2789,7 @@ Sometimes you need to generate a "random" number inside of a `GameplayAbility` f
 
 If your random deviation is small, most players won't notice that the sequence is the same every game and using the activation prediction key as the `random seed` should work for you. If you're doing something more complex that needs to be hacker proof, perhaps using a `Server Initiated` `GameplayAbility` would work better where the server can create the prediction key or generate the `random seed` to send via an event payload.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="cae-crit"></a>
 ### 5.6 Critical Hits
@@ -2797,25 +2797,25 @@ I handle critical hits inside of the damage [`ExecutionCalculation`](#concepts-g
 
 See how [GASShooter](https://github.com/tranek/GASShooter) does headshots. It's the same concept except that it does not rely on a random number for chance and instead checks the `FHitResult` bone name.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="cae-nonstackingge"></a>
 ### 5.7 Non-Stacking Gameplay Effects but Only the Greatest Magnitude Actually Affects the Target
 Slow effects in Paragon did not stack. Each slow instance applied and kept track of their lifetimes as normal, but only the greatest magnitude slow effect actually affected the `Character`. GAS provides for this scenario out of the box with `AggregatorEvaluateMetaData`. See [`AggregatorEvaluateMetaData()`](#concepts-as-onattributeaggregatorcreated) for details and implementation.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="cae-paused"></a>
 ### 5.8 Generate Target Data While Game is Paused
 If you need to pause the game while waiting to generate [`TargetData`](#concepts-targeting-data) from a `WaitTargetData` `AbilityTask` from your player, I suggest instead of pausing to use `slomo 0`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="cae-onebuttoninteractionsystem"></a>
 ### 5.9 One Button Interaction System
 [GASShooter](https://github.com/tranek/GASShooter) implements a one button interaction system where the player can press or hold 'E' to interact with interactable objects like reviving a player, opening a weapon chest, and opening or closing a sliding door.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="debugging"></a>
 ## 6. Отладка GAS
@@ -2838,7 +2838,7 @@ void MyClass::MyFunction(int32 MyIntParameter)
 PRAGMA_ENABLE_OPTIMIZATION_ACTUAL
 ```
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="debugging-sd"></a>
 ### 6.1 showdebug abilitysystem
@@ -2858,7 +2858,7 @@ PRAGMA_ENABLE_OPTIMIZATION_ACTUAL
 
 **Примечание:** Для работы команды `showdebug abilitysystem` в `GameMode` должен быть выбран реальный класс HUD. В противном случае команда не будет найдена и будет возвращено сообщение "Unknown Command".
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="debugging-gd"></a>
 ### 6.2 Gameplay Debugger
@@ -2868,7 +2868,7 @@ GAS добавляет функциональность отладчику иг�
 
 ![Gameplay Debugger](https://github.com/tranek/GASDocumentation/raw/master/Images/gameplaydebugger.png)
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="debugging-log"></a>
 ### 6.3 GAS Logging
@@ -2911,7 +2911,7 @@ log list
 
 Дополнительную информацию см. в [Wiki Logging](https://unrealcommunity.wiki/logging-lgpidy6i).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="optimizations"></a>
 ## 7. Optimizations
@@ -2940,7 +2940,7 @@ In large games with many players like Fortnite Battle Royale (FNBR), there will 
 ### 7.5 ASC Lazy Loading
 Fortnite Battle Royale (FNBR) has a lot of damageable `AActors` (trees, buildings, etc) in the world, each with an [`ASC`](#concepts-asc). This can add up in memory cost. FNBR optimizes this by lazily loading `ASCs` only when they're needed (when they first take damage by a player). This reduces overall memory usage since some `AActors` may never be damaged in a match.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="qol"></a>
 ## 8. Quality of Life Suggestions
@@ -2965,7 +2965,7 @@ Listen for `GE` stack changes:
 
 ![Listen for GameplayEffect Stack Change BP Node](https://github.com/tranek/GASDocumentation/raw/master/Images/gestackchange.png)
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="troubleshooting"></a>
 ## 9. Troubleshooting
@@ -2974,19 +2974,19 @@ Listen for `GE` stack changes:
 ### 9.1 `LogAbilitySystem: Warning: Can't activate LocalOnly or LocalPredicted ability %s when not local!`
 You need to [initialize the `ASC` on the client](#concepts-asc-setup).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="troubleshooting-scriptstructcache"></a>
 ### 9.2 `ScriptStructCache` errors
 You need to call [`UAbilitySystemGlobals::InitGlobalData()`](#concepts-asg-initglobaldata).
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="troubleshooting-replicatinganimmontages"></a>
 ### 9.3 Animation Montages are not replicating to clients
 Make sure that you're using the `PlayMontageAndWait` Blueprint node instead of `PlayMontage` in your [GameplayAbilities](#concepts-ga). This [AbilityTask](#concepts-at) replicates the montage through the `ASC` automatically whereas the `PlayMontage` node does not.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="troubleshooting-duplicatingblueprintactors"></a>
 ### 9.4 Duplicating Blueprint Actors is setting AttributeSets to nullptr
@@ -3041,7 +3041,7 @@ if (AbilitySystemComponent)
 
 As a reminder, the `ASC` only ever expects at most one `AttributeSet` object per `AttributeSet` class.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="troubleshooting-unresolvedexternalsymbolmarkpropertydirty"></a>
 ### 9.5 unresolved external symbol UEPushModelPrivate::MarkPropertyDirty(int,int)
@@ -3062,7 +3062,7 @@ What's happening is that `WITH_PUSH_MODEL` is getting defined in more than one p
 
 The solution is to add `NetCore` to your project's `PublicDependencyModuleNames` in the `Build.cs`.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="acronyms"></a>
 ## 10. Common GAS Acronyms
@@ -3081,7 +3081,7 @@ The solution is to add `NetCore` to your project's `PublicDependencyModuleNames`
 | GameplayTag                                                                                            | Tag, GT             |
 | ModifierMagnitudeCalculation                                                                           | ModMagCalc, MMC     |
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="resources"></a>
 ## 11. Other Resources
@@ -3195,7 +3195,7 @@ The solution is to add `NetCore` to your project's `PublicDependencyModuleNames`
 
 > This is only my personal opinion and not a commitment from anyone. I think the most realistic course of action will be as new engine tech initiatives come through, the ability system will need to be updated and that will be a time to do this sort of thing. These initiatives could be related to scripting, networking, or physics/character movement. This is all very far looking ahead though so I cannot give commitments or estimates on timelines.
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="resources-daveratti-community2"></a>
 #### 11.1.2 Community Questions 2
@@ -3314,7 +3314,7 @@ level or something that each game has to solve on it's own ?
 >
 > And then just to tie this back to what I said earlier - right now we are really focused on getting a few very specific examples working and performant and then we will turn attention back to the front end and making things friendly to use and iterate on, reducing boilerplate, etc for everybody else to use. 
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
 
 <a name="changelog"></a>
 ## 12. GAS Changelog
@@ -3414,4 +3414,4 @@ https://docs.unrealengine.com/en-US/WhatsNew/Builds/ReleaseNotes/4_25/
 
 https://docs.unrealengine.com/en-US/WhatsNew/Builds/ReleaseNotes/4_24/
 
-**[⬆ Back to Top](#table-of-contents)**
+**[⬆ Вернуться к началу](#table-of-contents)**
