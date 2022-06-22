@@ -2818,16 +2818,16 @@ If you need to pause the game while waiting to generate [`TargetData`](#concepts
 **[⬆ Back to Top](#table-of-contents)**
 
 <a name="debugging"></a>
-## 6. Debugging GAS
-Often when debugging GAS related issues, you want to know things like:
-> * "What are the values of my attributes?"
-> * "What gameplay tags do I have?"
-> * "What gameplay effects do I currently have?"
-> * "What abilities do I have granted, which ones are running, and which ones are blocked from activating?".
+## 6. Отладка GAS
+Часто при отладке проблем, связанных с GAS, вы хотите знать такие вещи, как:
+> * "Каковы значения моих атрибутов?"
+> * "Какие игровые теги у меня есть?"
+> * "Какими игровыми эффектами я обладаю в настоящее время?"
+> * "Какие способности у меня есть, какие работают, а какие заблокированы от активации?".
 
-GAS comes with two techniques for answering these questions at runtime - [`showdebug abilitysystem`](#debugging-sd) and hooks in the [`GameplayDebugger`](#debugging-gd).
+GAS поставляется с двумя методами для ответа на эти вопросы во время выполнения - [`showdebug abilitysystem`](#debugging-sd) и хуки в [`GameplayDebugger`](#debugging-gd).
 
-**Tip:** UE5 likes to optimize C++ code which makes it hard to debug some functions. You will encounter this rarely when tracing deep into your code. If setting your Visual Studio solution configuration to `DebugGame Editor` still prevents tracing code or inspecting variables, you can disable all optimizations by wrapping the optimized function with the `PRAGMA_DISABLE_OPTIMIZATION_ACTUAL` and `PRAGMA_ENABLE_OPTIMIZATION_ACTUAL` macros. This cannot be used on the plugin code unless you rebuild the plugin from source. This may or may not work on inline functions depending on what they do and where they are. Be sure to remove the macros when you're done debugging!
+**Совет:** UE5 любит оптимизировать код C++, что затрудняет отладку некоторых функций. Вы возможно столкнетесь с этим когда будете копаться в своем коде. Если настройка конфигурации решения Visual Studio в DebugGame Editor по-прежнему не позволяет отслеживать код или проверять переменные, вы можете отключить все оптимизации, обернув оптимизированную функцию макросами `PRAGMA_DISABLE_OPTIMIZATION_ACTUAL` и `PRAGMA_ENABLE_OPTIMIZATION_ACTUAL`. Это нельзя использовать в коде плагина, если вы не пересоберете плагин из исходного кода. Это может работать или не работать на встроенных функциях в зависимости от того, что они делают и где они находятся. Обязательно удалите макросы, когда закончите отладку!
 
 ```c++
 PRAGMA_DISABLE_OPTIMIZATION_ACTUAL
@@ -2842,28 +2842,29 @@ PRAGMA_ENABLE_OPTIMIZATION_ACTUAL
 
 <a name="debugging-sd"></a>
 ### 6.1 showdebug abilitysystem
-Type `showdebug abilitysystem` in the in-game console. This feature is split into three "pages". All three pages will show the `GameplayTags` that you currently have. Type `AbilitySystem.Debug.NextCategory` into the console to cycle between the pages.
 
-The first page shows the `CurrentValue` of all of your `Attributes`:
+Введите команду `showdebug abilitysystem` в игровой консоли. Эта функция разделена на три «страницы». На всех трех страницах будут отображаться теги `GameplayTags`, которые у вас есть в данный момент. Введите в консоли `AbilitySystem.Debug.NextCategory`, чтобы переключаться между страницами.
+
+На первой странице показано `CurrentValue` всех ваших `Attributes`:
 ![First Page of showdebug abilitysystem](https://github.com/tranek/GASDocumentation/raw/master/Images/showdebugpage1.png)
 
-The second page shows all of the `Duration` and `Infinite` `GameplayEffects` on you, their number of stacks, what `GameplayTags` they give, and what `Modifiers` they give.
+На второй странице показаны все `GameplayEffects` с типом продолжительности `Duration` и `Infinite`, которые на вас действуют, их количество Стаков, `GameplayTags`, которые они дают, и `Modifiers`, которые они дают.
 ![Second Page of showdebug abilitysystem](https://github.com/tranek/GASDocumentation/raw/master/Images/showdebugpage2.png)
 
-The third page shows all of the `GameplayAbilities` that have been granted to you, whether they are currently running, whether they are blocked from activating, and the status of currently running `AbilityTasks`.
+На третьей странице отображаются все `GameplayAbilities`, которые были вам предоставлены, работают ли они в данный момент, заблокированы ли они от активации, а также статус текущих `AbilityTasks`.
 ![Third Page of showdebug abilitysystem](https://github.com/tranek/GASDocumentation/raw/master/Images/showdebugpage3.png)
 
-While you can cycle between targets with `PageUp` and `PageDown`, the pages will only show data for the `ASC` on your locally controlled `Character`. However, using `AbilitySystem.Debug.NextTarget` and `AbilitySystem.Debug.PrevTarget` will show data for other `ASCs`, but it will not update the top half of the debug information nor will it update the green targeting rectangular prism so there is no way to know which `ASC` is currently being targeted. This bug has been reported https://issues.unrealengine.com/issue/UE-90437.
+Хотя вы можете переключаться между целями с помощью `PageUp` и `PageDown`, на страницах будут отображаться только данные для `ASC` вашего локально контролируемого вами `Character`. Тем не менее, использование `AbilitySystem.Debug.NextTarget` и `AbilitySystem.Debug.PrevTarget` покажет данные для других `ASC`, но не обновит верхнюю половину отладочной информации и не обновит зеленую прямоугольную призму прицеливания, поэтому невозможно узнать, какой из них `ASC` в настоящее время находится под прицелом. Об этой ошибке сообщалось https://issues.unrealengine.com/issue/UE-90437.
 
-**Note:** For `showdebug abilitysystem` to work an actual HUD class must be selected in the GameMode. Otherwise the command is not found and "Unknown Command" is returned.
+**Примечание:** Для работы команды `showdebug abilitysystem` в `GameMode` должен быть выбран реальный класс HUD. В противном случае команда не будет найдена и будет возвращено сообщение "Unknown Command".
 
 **[⬆ Back to Top](#table-of-contents)**
 
 <a name="debugging-gd"></a>
 ### 6.2 Gameplay Debugger
-GAS adds functionality to the Gameplay Debugger. Access the Gameplay Debugger with the Apostrophe (') key. Enable the Abilities category by pressing 3 on your numpad. The category may be different depending on what plugins you have. If your keyboard doesn't have a numpad like a laptop, then you can change the keybindings in the project settings.
+GAS добавляет функциональность отладчику игрового процесса. Получите доступ к отладчику игрового процесса с помощью клавиши апострофа ('). Включите категорию «Способности», нажав 3 на цифровой клавиатуре. Категория может быть разной в зависимости от того, какие у вас плагины. Если на вашей клавиатуре нет цифровой клавиатуры, как на ноутбуке, вы можете изменить привязки клавиш в настройках проекта.
 
-Use the Gameplay Debugger when you want to see the `GameplayTags`, `GameplayEffects`, and `GameplayAbilities` on **other** `Characters`. Unfortunately it does not show the `CurrentValue` of the target's `Attributes`. It will target whatever `Character` is in the center of your screen. You can change targets by selecting them in the World Outliner in the Editor or by looking at a different `Character` and press Apostrophe (') again. The currently inspected `Character` has the largest red circle above it.
+Используйте Gameplay Debugger, если вы хотите увидеть `GameplayTags`, `GameplayEffects` и `GameplayAbilities` на **других** `Characters`. К сожалению, он не показывает `CurrentValue` у `Attributes` цели. Он нацелится на любого `Character`, который находится в центре вашего экрана. Вы можете изменить цели, выбрав их в World Outliner в Editor или посмотрев на другого `Character` и снова нажав апостроф ('). Над текущим проверяемым `Character` находится самый большой красный кружок.
 
 ![Gameplay Debugger](https://github.com/tranek/GASDocumentation/raw/master/Images/gameplaydebugger.png)
 
@@ -2871,30 +2872,30 @@ Use the Gameplay Debugger when you want to see the `GameplayTags`, `GameplayEffe
 
 <a name="debugging-log"></a>
 ### 6.3 GAS Logging
-The GAS source code contains a lot of logging statements produced at varying verbosity levels. You will most likely see these as `ABILITY_LOG()` statements. The default verbosity level is `Display`. Anything higher will not be displayed in the console by default.
+Исходный код GAS содержит множество операторов логирования, созданных с разным уровнем детализации. Скорее всего, вы увидите их как операторы `ABILITY_LOG()`. Уровень детализации по умолчанию — `Display`. Все, что выше, не будет отображаться в консоли по умолчанию.
 
-To change the verbosity level of a log category, type into your console:
+Чтобы изменить уровень логирования категории журнала, введите в консоль:
 
 ```
 log [category] [verbosity]
 ```
 
-For example, to turn on `ABILITY_LOG()` statements, you would type into your console:
+Например, чтобы включить операторы `ABILITY_LOG()`, вы должны ввести в консоль:
 ```
 log LogAbilitySystem VeryVerbose
 ```
 
-To reset it back to default, type:
+Чтобы вернуть значение по умолчанию, введите:
 ```
 log LogAbilitySystem Display
 ```
 
-To display all log categories, type:
+Чтобы отобразить все категории журналов, введите:
 ```
 log list
 ```
 
-Notable GAS related logging categories:
+Известные категории журналов, связанные с GAS:
 
 | Logging Category          | Default Verbosity Level |
 | ------------------------- | ----------------------- |
@@ -2908,7 +2909,7 @@ Notable GAS related logging categories:
 | LogGameplayTasks          | Log                     |
 | VLogAbilitySystem         | Display                 |
 
-See the [Wiki on Logging](https://unrealcommunity.wiki/logging-lgpidy6i) for more information.
+Дополнительную информацию см. в [Wiki Logging](https://unrealcommunity.wiki/logging-lgpidy6i).
 
 **[⬆ Back to Top](#table-of-contents)**
 
