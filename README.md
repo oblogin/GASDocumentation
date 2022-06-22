@@ -799,7 +799,7 @@ Your custom `AggregatorEvaluateMetaData` for qualifiers should be added to `FAgg
 
 <a name="concepts-ge-definition"></a>
 #### 4.5.1 Определение Gameplay Effect
-[`GameplayEffects`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UGameplayEffect/index.html) (`GE`) — сосуды, через которые способности меняют [`Attributes`](#concepts-a) и [`GameplayTags`](#concepts-gt) на себе и других. Они могут вызывать немедленные изменения `Attribute`, такие как урон или исцеление или применять долгосрочные баффы / дебаффы, такие как повышение скорости передвижения или оглушение. Класс `UGameplayEffect` должен быть классом **только для данных**, который определяет один игровой эффект. Никакой дополнительной логики не следует добавлять в `GameplayEffects`. Обычно дизайнеры создают множество дочерних классов Blueprint для `UGameplayEffect`.
+[`GameplayEffects`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UGameplayEffect/index.html) (`GE`) — это полностью информационные классы, через которые `GameplayAbilities` меняют [`Attributes`](#concepts-a) и [`GameplayTags`](#concepts-gt) на владельце способности и других `ASC`. `GameplayEffects` могут вызывать **Немедленные** (`Instant`) изменения `Attribute`, например нанесение урона / исцеление, так же можно применять эффекты Определенное (`Duration`) или Бесконечное (`Infinite`) количество времени, так называемые баффы / дебаффы, такие как повышение скорости передвижения или оглушение. Класс `UGameplayEffect` должен быть классом **только для данных**, который определяет один `GameplayEffect`. Никакой дополнительной логики не следует добавлять в `GameplayEffects`. Обычно дизайнеры создают множество дочерних классов Blueprint для `UGameplayEffect`.
 
 `GameplayEffects` изменяет `Attributes` посредствам [`Modifiers`](#concepts-ge-mods) и [`Executions` (`GameplayEffectExecutionCalculation`)](#concepts-ge-ec).
 
@@ -1224,11 +1224,11 @@ If you don't add the `FGameplayEffectAttributeCaptureDefinition` to `RelevantAtt
 
 <a name="concepts-ge-ec"></a>
 #### 4.5.12 Gameplay Effect Execution Calculation
-[`GameplayEffectExecutionCalculations`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UGameplayEffectExecutionCalculat-/index.html) (`ExecutionCalculation`, `Execution` (you will often see this term in the plugin's source code), or `ExecCalc`) are the most powerful way for `GameplayEffects` to make changes to an `ASC`. Like [`ModifierMagnitudeCalculations`](#concepts-ge-mmc), these can capture `Attributes` and optionally snapshot them. Unlike `MMCs`, these can change more than one `Attribute` and essentially do anything else that the programmer wants. The downside to this power and flexibility is that they can not be [predicted](#concepts-p) and they must be implemented in C++.
+[`GameplayEffectExecutionCalculations`](https://docs.unrealengine.com/en-US/API/Plugins/GameplayAbilities/UGameplayEffectExecutionCalculat-/index.html) (`ExecutionCalculation`, `Execution` (вы часто будете видеть этот термин в исходном коде плагина) или `ExecCalc`) — это самый мощный способ для `GameplayEffects` вносить изменения в `ASC`. Как и [`ModifierMagnitudeCalculations`](#concepts-ge-mmc), они могут фиксировать атрибуты и при необходимости, делать их снимки. В отличие от `ModifierMagnitudeCalculations`, они могут изменять более одного `Attribute` и по сути делать все, что захочет программист. Недостатком этой мощности и гибкости является то, что их нельзя [предсказать](#concepts-p), и они должны быть реализованы на C++.
 
-`ExecutionCalculations` can only be used with `Instant` and `Periodic` `GameplayEffects`. Anything with the word 'Execute' in it typically refers to these two types of `GameplayEffects`.
+`ExecutionCalculations` можно использовать только с `GameplayEffects` у которых тип продолжительности `Instant` и `Periodic`. Все, что содержит слово 'Execute', обычно относится к этим двум типам `GameplayEffects`.
 
-Snapshotting captures the `Attribute` when the `GameplayEffectSpec` is created whereas not snapshotting captures the `Attribute` when the `GameplayEffectSpec` is applied. Capturing `Attributes` recalculates their `CurrentValue` from existing mods on the `ASC`. This recalculation will **not** run [`PreAttributeChange()`](#concepts-as-preattributechange) in the `AbilitySet` so any clamping must be done here again.
+Снимок фиксирует `Attribute`, когда создается `GameplayEffectSpec`, тогда как не моментальный снимок фиксирует `Attribute`, когда применяется `GameplayEffectSpec`. Фиксация `Attributes` пересчитывает их `CurrentValue` из существующих модификаций на `ASC`. Этот перерасчет **не** запустит [`PreAttributeChange()`](#concepts-as-preattributechange) в `AbilitySet`, поэтому любое зажатие атрибута должно быть выполнено здесь снова.
 
 | Snapshot | Source or Target | Captured on `GameplayEffectSpec` |
 | -------- | ---------------- | -------------------------------- |
@@ -1237,11 +1237,12 @@ Snapshotting captures the `Attribute` when the `GameplayEffectSpec` is created w
 | No       | Source           | Application                      |
 | No       | Target           | Application                      |
 
-To set up `Attribute` capture, we follow a pattern set by Epic's ActionRPG Sample Project by defining a struct holding and defining how we capture the `Attributes` and creating one copy of it in the struct's constructor. You will have a struct like this for every `ExecCalc`. **Note:** Each struct needs a unique name as they share the same namespace. Using the same name for the structs will cause incorrect behavior in capturing your `Attributes` (mostly capturing the values of the wrong `Attributes`).
+Чтобы настроить фиксацию `Attribute`, мы следуем шаблону, установленному в примере проекта Epic ActionRPG, определяя структуру, содержащую и определяя, как мы собираем `Attributes`, и создавая одну ее копию в конструкторе структуры. У вас будет такая структура для каждого `ExecCalc`. **Примечание**. Каждой структуре требуется уникальное имя, поскольку они используют одно и то же пространство имен. Использование одного и того же имени для структур приведет к неправильному поведению при фиксации ваших `Attributes` (в основном при фиксации значений неправильных `Attributes`).
 
 For `Local Predicted`, `Server Only`, and `Server Initiated` [`GameplayAbilities`](#concepts-ga), the `ExecCalc` only calls on the Server.
+`ExecCalc` вызывается только на Server для `Local Predicted`, `Server Only` и `Server Initiated` [`GameplayAbilities`](#concepts-ga).
 
-Calculating damage received based on a complex formula reading from many attributes on the `Source` and the `Target` is the most common example of an `ExecCalc`. The included Sample Project has a simple `ExecCalc` for calculating damage that reads the value of damage from the `GameplayEffectSpec's` [`SetByCaller`](#concepts-ge-spec-setbycaller) and then mitigates that value based on the armor `Attribute` captured from the `Target`. See `GDDamageExecCalculation.cpp/.h`.
+Вычисление полученного урона на основе сложной формулы, считываемой из многих атрибутов `Source` и `Target`, является наиболее распространенным примером `ExecCalc`. Включенный пример проекта имеет простой `ExecCalc` для расчета урона, который считывает значение урона из [`SetByCaller`](#concepts-ge-spec-setbycaller) `GameplayEffectSpec`, а затем уменьшает это значение на основе `Attribute` брони, полученного от `Target`. См. `GDDamageExecCalculation.cpp/.h`.
 
 **[⬆ Вернуться к началу](#table-of-contents)**
 
