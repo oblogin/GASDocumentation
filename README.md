@@ -2848,7 +2848,7 @@ PRAGMA_ENABLE_OPTIMIZATION_ACTUAL
 На первой странице показано `CurrentValue` всех ваших `Attributes`:
 ![First Page of showdebug abilitysystem](https://github.com/tranek/GASDocumentation/raw/master/Images/showdebugpage1.png)
 
-На второй странице показаны все `GameplayEffects` с типом продолжительности `Duration` и `Infinite`, которые на вас действуют, их количество Стаков, `GameplayTags`, которые они дают, и `Modifiers`, которые они дают.
+На второй странице показаны все `GameplayEffects` с типом продолжительности `Duration` и `Infinite`, которые на вас действуют, количество Стаков, `GameplayTags` и `Modifiers` которые они дают.
 ![Second Page of showdebug abilitysystem](https://github.com/tranek/GASDocumentation/raw/master/Images/showdebugpage2.png)
 
 На третьей странице отображаются все `GameplayAbilities`, которые были вам предоставлены, работают ли они в данный момент, заблокированы ли они от активации, а также статус текущих `AbilityTasks`.
